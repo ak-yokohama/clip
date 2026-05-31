@@ -131,6 +131,12 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
 .add-tag-input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--radiusSm);color:var(--text);padding:10px 12px;font-size:14px;outline:none;font-family:'Noto Sans JP',sans-serif;}
 .add-tag-input:focus{border-color:var(--accent);}
 .add-tag-btn{padding:10px 16px;background:var(--accent);border:none;border-radius:var(--radiusSm);color:#fff;font-size:13px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;}
+/* アプリ更新ボタン */
+.update-section{margin-top:8px;padding:16px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);}
+.update-desc{font-size:12px;color:var(--text3);margin-bottom:12px;line-height:1.6;}
+.update-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),#5B4FD9);border:none;border-radius:var(--radiusSm);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;}
+.update-btn:active{opacity:.85;}
+.update-btn svg{width:18px;height:18px;}
 /* Toast */
 .toast{position:fixed;top:64px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:11px 22px;border-radius:8px;font-size:13px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
 .toast.show{opacity:1;}
@@ -296,6 +302,16 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
     <div class="settings-section">
       <div class="settings-section-title">タグの管理</div>
       <div id="tagManageList"></div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-section-title">アプリの更新</div>
+      <div class="update-section">
+        <div class="update-desc">データを保持したまま、アプリを最新バージョンに更新します。GitHubに新しいバージョンをアップした後にタップしてください。</div>
+        <button class="update-btn" onclick="updateAppVersion()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.45"/></svg>
+          アプリを最新版に更新
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -806,7 +822,7 @@ function saveItem(){
   if(editingId){
     const item=items.find(x=>x.id===editingId);
     if(item){
-      item.title=title; item.yomi=yomi; item.cat=newCatSel; item.tags=[...newTagSel];
+      item.title=title; item.yomi=yomi||undefined; item.cat=newCatSel; item.tags=[...newTagSel];
       item.link=link||undefined;
       item.image=image||item.image||undefined;
       if(newCatSel!=='interest') item.status=document.getElementById('statusSelect').value;
@@ -820,7 +836,7 @@ function saveItem(){
     }
     showToast('更新しました！');
   } else {
-    const ni={id:Date.now(),title,yomi,cat:newCatSel,tags:[...newTagSel],order:items.length};
+    const ni={id:Date.now(),title,yomi:yomi||undefined,cat:newCatSel,tags:[...newTagSel],order:items.length};
     if(link)  ni.link=link;
     if(image) ni.image=image;
     if(newCatSel!=='interest') ni.status=document.getElementById('statusSelect').value;
@@ -927,6 +943,30 @@ function showToast(msg){
   const el=document.getElementById('toast');
   el.textContent=msg; el.classList.add('show');
   setTimeout(()=>el.classList.remove('show'),2200);
+}
+
+// ===== アプリ更新（データ保持・キャッシュクリア） =====
+async function updateAppVersion(){
+  showToast('🔄 最新バージョンに更新中...');
+  try{
+    // Service Workerのキャッシュを全削除
+    if('caches' in window){
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k=>caches.delete(k)));
+    }
+    // Service Workerの登録を更新
+    if('serviceWorker' in navigator){
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r=>r.update()));
+    }
+    // 1秒後にハードリロード（データは localStorage に残る）
+    setTimeout(()=>{
+      window.location.reload(true);
+    }, 1000);
+  } catch(e){
+    // フォールバック：強制リロード
+    setTimeout(()=>{ window.location.reload(true); }, 800);
+  }
 }
 
 // ===== Service Worker =====
