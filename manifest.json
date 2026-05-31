@@ -1,6 +1,6 @@
 {
-  "name": "Clip App",
-  "short_name": "ClipApp",
+  "name": "The MasterShelf",
+  "short_name": "MasterShelf",
   "description": "スマート外部脳アプリ",
   "start_url": "./index.html",
   "display": "standalone",
