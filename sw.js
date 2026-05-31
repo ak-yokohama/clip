@@ -1,18 +1,29 @@
-const CACHE = 'alexa-snap-v1';
-const ASSETS = ['./index.html', './manifest.json'];
+// バージョンを上げるたびに古いキャッシュが自動削除される
+const CACHE = 'mastershelf-v1';
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
+  // 即座に新しいSWを有効化（待機しない）
   self.skipWaiting();
 });
+
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys =>
-    Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-  ));
-  self.clients.claim();
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.map(k => {
+        console.log('Deleting cache:', k);
+        return caches.delete(k);
+      }))
+    ).then(() => self.clients.claim())
+  );
 });
+
 self.addEventListener('fetch', e => {
+  // 全リクエストを常にネットワーク優先で取得
+  // キャッシュは使わない（常に最新を取得）
   e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match('./index.html')))
+    fetch(e.request).catch(() => {
+      // オフライン時のみキャッシュから返す
+      return caches.match(e.request);
+    })
   );
 });
