@@ -13,8 +13,9 @@
 <title>Clip App</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
-<!-- Tesseract.js OCR -->
-<script src="https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js"></script>
+<!-- Cropper.js（画像トリミング） -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{
@@ -75,6 +76,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
 .delete-btn svg{width:15px;height:15px;}
 .fab{position:fixed;bottom:24px;right:24px;width:60px;height:60px;border-radius:30px;background:var(--accent);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(124,110,250,.45);z-index:50;}
 .fab svg{width:28px;height:28px;}
+/* モーダル共通 */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;display:flex;align-items:flex-end;justify-content:center;}
 .modal{background:var(--bg2);border-radius:20px 20px 0 0;padding:20px 20px 36px;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
@@ -92,6 +94,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
 .form-row{display:flex;gap:10px;}
 .form-row>div{flex:1;}
 .submit-btn{width:100%;padding:15px;background:var(--accent);border:none;border-radius:var(--radius);color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;margin-top:4px;}
+/* 確認ダイアログ */
 .confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:150;display:flex;align-items:center;justify-content:center;padding:20px;}
 .confirm-box{background:var(--bg2);border-radius:var(--radius);padding:22px;width:100%;max-width:320px;border:1px solid var(--border);}
 .confirm-title{font-size:15px;font-weight:500;margin-bottom:8px;}
@@ -99,6 +102,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
 .confirm-btns{display:flex;gap:8px;}
 .confirm-cancel{flex:1;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radiusSm);color:var(--text2);cursor:pointer;font-family:'Noto Sans JP',sans-serif;font-size:14px;}
 .confirm-del{flex:1;padding:12px;background:rgba(240,96,96,.15);border:1px solid var(--coral);border-radius:var(--radiusSm);color:var(--coral);cursor:pointer;font-family:'Noto Sans JP',sans-serif;font-size:14px;}
+/* 設定画面 */
 .settings-overlay{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;flex-direction:column;}
 .settings-header{display:flex;align-items:center;gap:12px;padding:52px 20px 16px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .settings-back{background:transparent;border:none;color:var(--text2);cursor:pointer;padding:4px;display:flex;align-items:center;}
@@ -113,6 +117,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
 .toggle.on{background:var(--accent);}
 .toggle::after{content:'';position:absolute;width:21px;height:21px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform .2s;}
 .toggle.on::after{transform:translateX(19px);}
+/* タグ管理 */
 .tag-section-label{font-size:13px;font-weight:500;color:var(--accent2);margin:16px 0 8px 2px;}
 .tag-manage-row{display:flex;align-items:center;padding:10px 14px;background:var(--surface);border-radius:var(--radiusSm);margin-bottom:6px;gap:6px;}
 .tag-manage-name{font-size:14px;color:var(--text2);flex:1;}
@@ -126,10 +131,12 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
 .add-tag-input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--radiusSm);color:var(--text);padding:10px 12px;font-size:14px;outline:none;font-family:'Noto Sans JP',sans-serif;}
 .add-tag-input:focus{border-color:var(--accent);}
 .add-tag-btn{padding:10px 16px;background:var(--accent);border:none;border-radius:var(--radiusSm);color:#fff;font-size:13px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;}
+/* Toast */
 .toast{position:fixed;top:64px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:11px 22px;border-radius:8px;font-size:13px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
 .toast.show{opacity:1;}
 .empty-state{text-align:center;padding:60px 20px;color:var(--text3);font-size:14px;}
 .empty-state svg{width:44px;height:44px;margin:0 auto 12px;display:block;opacity:.4;}
+/* 画像・リンク */
 .item-thumb{width:52px;min-width:52px;height:52px;border-radius:6px;object-fit:cover;margin-right:6px;background:var(--bg3);}
 .item-link{font-size:11px;color:var(--accent2);text-decoration:none;display:flex;align-items:center;gap:3px;margin-top:3px;word-break:break-all;}
 .item-link svg{width:11px;height:11px;flex-shrink:0;}
@@ -139,6 +146,17 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
 .image-preview-wrap{position:relative;margin-bottom:14px;}
 .image-preview-wrap img{width:100%;max-height:140px;object-fit:cover;border-radius:var(--radiusSm);}
 .image-preview-del{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.6);border:none;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;}
+/* OCRステータス */
+.ocr-status{font-size:12px;color:var(--accent2);padding:4px 2px;margin-bottom:10px;}
+/* トリミングモーダル */
+.crop-overlay{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:300;display:flex;flex-direction:column;}
+.crop-header{display:flex;align-items:center;justify-content:space-between;padding:52px 16px 12px;flex-shrink:0;}
+.crop-title{font-size:16px;font-weight:700;color:var(--text);}
+.crop-body{flex:1;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:0 8px;}
+.crop-body img{max-width:100%;max-height:100%;}
+.crop-footer{display:flex;gap:10px;padding:16px;flex-shrink:0;}
+.crop-cancel-btn{flex:1;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);cursor:pointer;font-family:'Noto Sans JP',sans-serif;font-size:15px;}
+.crop-confirm-btn{flex:2;padding:14px;background:var(--accent);border:none;border-radius:var(--radius);color:#fff;cursor:pointer;font-family:'Noto Sans JP',sans-serif;font-size:15px;font-weight:700;}
 </style>
 </head>
 <body>
@@ -190,10 +208,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
       <input type="file" id="screenshotInput" accept="image/*" style="display:none;" onchange="handleImageSelect(event)" />
       <div id="ocrPreview" style="display:none;margin-bottom:12px;">
         <div class="image-preview-wrap">
-          <img id="ocrPreviewImg" />
+          <img id="ocrPreviewImg" alt="preview" />
           <button class="image-preview-del" onclick="clearImage()">✕</button>
         </div>
-        <div id="ocrStatus" style="font-size:12px;color:var(--accent2);padding:4px 2px 0;"></div>
+        <div id="ocrStatus" class="ocr-status"></div>
       </div>
       <label class="form-label">URLリンク（任意）</label>
       <div class="link-input-row">
@@ -232,7 +250,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
     </div>
     <label class="form-label">シチュエーションタグ</label>
     <div class="cat-select-row" id="tagSelectRow"></div>
-    <button class="submit-btn" id="submitBtn" onclick="saveItem()">保存する</button>
+    <button class="submit-btn" onclick="saveItem()">保存する</button>
   </div>
 </div>
 
@@ -248,7 +266,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
   </div>
 </div>
 
-<!-- タグ削除確認（z-index:300 → 設定画面200より前面） -->
+<!-- タグ削除確認（z-index:300） -->
 <div class="confirm-overlay" id="tagConfirmOverlay" style="display:none;z-index:300;">
   <div class="confirm-box">
     <div class="confirm-title">このタグを削除しますか？</div>
@@ -276,9 +294,23 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
       <div id="catToggleList"></div>
     </div>
     <div class="settings-section">
-      <div class="settings-section-title">タグの管理（長押しで並び替え）</div>
+      <div class="settings-section-title">タグの管理</div>
       <div id="tagManageList"></div>
     </div>
+  </div>
+</div>
+
+<!-- トリミングモーダル -->
+<div class="crop-overlay" id="cropOverlay" style="display:none;">
+  <div class="crop-header">
+    <span class="crop-title">✂️ 切り抜き範囲を選択</span>
+  </div>
+  <div class="crop-body">
+    <img id="cropImage" alt="crop" />
+  </div>
+  <div class="crop-footer">
+    <button class="crop-cancel-btn" onclick="cancelCrop()">キャンセル</button>
+    <button class="crop-confirm-btn" onclick="confirmCrop()">この範囲で保存</button>
   </div>
 </div>
 
@@ -299,11 +331,12 @@ const ALL_CATS = [
   {id:'interest', label:'関心',   emoji:'✨'},
   {id:'other',    label:'その他', emoji:'📦'},
 ];
+// 状態区分（全カテゴリに「不明」追加）
 const STATUS_OPTIONS = {
   music:    [{v:'free',l:'無料'},{v:'paid',l:'有料'},{v:'unknown',l:'不明'}],
   movie:    [{v:'free',l:'無料'},{v:'paid',l:'有料'},{v:'unknown',l:'不明'}],
   other:    [{v:'free',l:'無料'},{v:'paid',l:'有料'},{v:'unknown',l:'不明'}],
-  book:     [{v:'free',l:'無料'},{v:'general',l:'一般'}],
+  book:     [{v:'free',l:'無料'},{v:'general',l:'一般'},{v:'unknown',l:'不明'}],
   interest: [],
 };
 
@@ -340,10 +373,12 @@ let editingId = null;
 let newCatSel = 'music', newTagSel = new Set();
 let pendingDeleteId = null;
 let pendingDeleteTag = null, pendingDeleteTagCat = null;
+let cropperInstance = null;
 
 // ===== ヘルパー =====
 function visibleCats(){ return ALL_CATS.filter(c=>!hiddenCats.has(c.id)); }
 function catEmoji(c){ return ALL_CATS.find(x=>x.id===c)?.emoji||'📦'; }
+
 function statusBadge(s){
   if(!s||s==='unknown') return '<span class="status-badge badge-unknown">不明</span>';
   if(s==='free')        return '<span class="status-badge badge-free">無料</span>';
@@ -405,8 +440,9 @@ function renderList(){
   el.innerHTML=list.map(item=>{
     const tags=(item.tags||[]).map(t=>`<span class="item-tag">${t}</span>`).join('');
     const priceStr=item.price?`<span class="item-price">¥${item.price.toLocaleString()}</span>`:'';
-    const thumbHtml=item.image?`<img class="item-thumb" src="${item.image}" />`:'';
-    const linkHtml=item.link?`<a class="item-link" href="${item.link}" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>${item.link.length>35?item.link.substring(0,35)+'...':item.link}</a>`:'';
+    const thumbHtml=item.image?`<img class="item-thumb" src="${item.image}" alt="thumb" />`:'';
+    const safeLink=item.link?item.link.replace(/"/g,'&quot;'):'';
+    const linkHtml=item.link?`<a class="item-link" href="${safeLink}" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>${item.link.length>35?item.link.substring(0,35)+'...':item.link}</a>`:'';
     const safeTitle=item.title.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     const canAlexa=item.cat==='music'||item.cat==='movie';
     return `<div class="item-card" id="card-${item.id}" data-id="${item.id}">
@@ -442,8 +478,8 @@ function launchOfficialApp(cat, query){
   if(!query) return;
   const q=encodeURIComponent(query);
   let url='';
-  if(cat==='music')       url=`amznmp://share?searchQuery=${q}`;
-  else if(cat==='movie')  url=`primevideo://search?phrase=${q}`;
+  if(cat==='music')      url=`amznmp://share?searchQuery=${q}`;
+  else if(cat==='movie') url=`primevideo://search?phrase=${q}`;
   if(!url) return;
   window.location.href=url;
   setTimeout(()=>{
@@ -455,49 +491,32 @@ function launchOfficialApp(cat, query){
   },1500);
 }
 
-// ===== タッチドラッグ（リスト並び替え）完全書き直し版 =====
+// ===== タッチドラッグ（リスト並び替え）=====
 function initTouchDrag(){
   const la=document.getElementById('listArea');
-  // 古いリスナーを削除するためにcloneで置き換え
   const newLa=la.cloneNode(true);
   la.parentNode.replaceChild(newLa,la);
-  // イベントを再バインド（onclickはHTMLに記述済みなので問題なし）
 
-  let dragId=null, ghost=null, startY=0, startScrollY=0, origRect=null;
+  let dragId=null, ghost=null, startY=0, origRect=null;
 
-  function getAllCards(){
-    return [...document.getElementById('listArea').querySelectorAll('.item-card')];
-  }
-  function getListArea(){
-    return document.getElementById('listArea');
-  }
+  function getAllCards(){ return [...document.getElementById('listArea').querySelectorAll('.item-card')]; }
+  function getLA(){ return document.getElementById('listArea'); }
 
-  document.getElementById('listArea').addEventListener('touchstart',function(e){
+  getLA().addEventListener('touchstart',function(e){
     const handle=e.target.closest('.drag-handle');
     if(!handle) return;
     const card=handle.closest('.item-card');
     if(!card) return;
-
     dragId=parseInt(card.dataset.id);
     origRect=card.getBoundingClientRect();
     startY=e.touches[0].clientY;
-    startScrollY=getListArea().scrollTop;
-
-    // ゴーストを作成
     ghost=card.cloneNode(true);
     ghost.style.cssText=[
-      'position:fixed',
-      `left:${origRect.left}px`,
-      `top:${origRect.top}px`,
-      `width:${origRect.width}px`,
-      'z-index:9999',
-      'opacity:0.85',
-      'pointer-events:none',
-      'border:2px solid var(--accent)',
-      'border-radius:12px',
-      'background:var(--surface)',
-      'box-shadow:0 8px 28px rgba(124,110,250,.4)',
-      'transition:none'
+      'position:fixed',`left:${origRect.left}px`,`top:${origRect.top}px`,
+      `width:${origRect.width}px`,'z-index:9999','opacity:0.85',
+      'pointer-events:none','border:2px solid var(--accent)',
+      'border-radius:12px','background:var(--surface)',
+      'box-shadow:0 8px 28px rgba(124,110,250,.4)','transition:none'
     ].join(';');
     document.body.appendChild(ghost);
     card.style.opacity='0.25';
@@ -507,46 +526,34 @@ function initTouchDrag(){
   document.addEventListener('touchmove',function(e){
     if(dragId===null||!ghost) return;
     e.preventDefault();
-
     const ty=e.touches[0].clientY;
-    const dy=ty-startY;
-    ghost.style.top=(origRect.top+dy)+'px';
-
-    // インジケーター更新
+    ghost.style.top=(origRect.top+(ty-startY))+'px';
     getAllCards().forEach(c=>c.classList.remove('drag-over-top','drag-over-bottom'));
-    const ghostCenterY=origRect.top+dy+origRect.height/2;
+    const ghostCY=origRect.top+(ty-startY)+origRect.height/2;
     const target=getAllCards().find(c=>{
       if(parseInt(c.dataset.id)===dragId) return false;
       const r=c.getBoundingClientRect();
-      return ghostCenterY>=r.top&&ghostCenterY<=r.bottom;
+      return ghostCY>=r.top&&ghostCY<=r.bottom;
     });
     if(target){
       const tr=target.getBoundingClientRect();
-      const mid=tr.top+tr.height/2;
-      target.classList.add(ghostCenterY<mid?'drag-over-top':'drag-over-bottom');
+      target.classList.add(ghostCY<tr.top+tr.height/2?'drag-over-top':'drag-over-bottom');
     }
   },{passive:false});
 
   document.addEventListener('touchend',function(e){
     if(dragId===null||!ghost) return;
-
     const ty=e.changedTouches[0].clientY;
-    const dy=ty-startY;
-    const ghostCenterY=origRect.top+dy+origRect.height/2;
-
-    // ドロップ先を確定
+    const ghostCY=origRect.top+(ty-startY)+origRect.height/2;
     const target=getAllCards().find(c=>{
       if(parseInt(c.dataset.id)===dragId) return false;
       const r=c.getBoundingClientRect();
-      return ghostCenterY>=r.top&&ghostCenterY<=r.bottom;
+      return ghostCY>=r.top&&ghostCY<=r.bottom;
     });
-
     if(target){
       const targetId=parseInt(target.dataset.id);
       const tr=target.getBoundingClientRect();
-      const mid=tr.top+tr.height/2;
-      const insertAfter=ghostCenterY>=mid;
-
+      const insertAfter=ghostCY>=tr.top+tr.height/2;
       const di=items.findIndex(x=>x.id===dragId);
       if(di!==-1){
         const [moved]=items.splice(di,1);
@@ -556,13 +563,8 @@ function initTouchDrag(){
         saveData();
       }
     }
-
-    // クリーンアップ
     ghost.remove(); ghost=null;
-    getAllCards().forEach(c=>{
-      c.classList.remove('drag-over-top','drag-over-bottom');
-      c.style.opacity='';
-    });
+    getAllCards().forEach(c=>{ c.classList.remove('drag-over-top','drag-over-bottom'); c.style.opacity=''; });
     dragId=null;
     renderList();
   });
@@ -587,7 +589,6 @@ function openModal(id){
   editingId=id;
   const item=id?items.find(x=>x.id===id):null;
   document.getElementById('modalTitleLabel').textContent=item?'アイテムを編集':'アイテムを追加';
-  // 編集時もocrBtnAreaを常に表示（修正点2）
   document.getElementById('ocrBtnArea').style.display='block';
   newCatSel=item?item.cat:activeCat;
   newTagSel=new Set(item?.tags||[]);
@@ -597,11 +598,10 @@ function openModal(id){
   document.getElementById('priceInput').value=item?.price||'';
   document.getElementById('deadlineInput').value=item?.deadline||'';
   document.getElementById('screenshotInput').value='';
-  // 画像プレビュー復元
+  document.getElementById('ocrStatus').textContent='';
   if(item?.image){
     document.getElementById('ocrPreviewImg').src=item.image;
     document.getElementById('ocrPreview').style.display='block';
-    document.getElementById('ocrStatus').textContent='';
   } else {
     document.getElementById('ocrPreview').style.display='none';
     document.getElementById('ocrPreviewImg').src='';
@@ -622,15 +622,21 @@ function renderCatSelect(){
   ).join('');
 }
 function selectNewCat(id){ newCatSel=id; newTagSel=new Set(); renderCatSelect(); updateDynamicFields(); renderTagSelect(); }
+
 function updateDynamicFields(){
   const opts=STATUS_OPTIONS[newCatSel]||[];
   const ss=document.getElementById('statusSection');
   const ts=document.getElementById('typeSection');
   const is=document.getElementById('interestSection');
-  if(newCatSel==='interest'){ ss.style.display='none'; is.style.display='block'; }
-  else{ ss.style.display='block'; is.style.display='none'; document.getElementById('statusSelect').innerHTML=opts.map(o=>`<option value="${o.v}">${o.l}</option>`).join(''); }
+  if(newCatSel==='interest'){
+    ss.style.display='none'; is.style.display='block';
+  } else {
+    ss.style.display='block'; is.style.display='none';
+    document.getElementById('statusSelect').innerHTML=opts.map(o=>`<option value="${o.v}">${o.l}</option>`).join('');
+  }
   ts.style.display=newCatSel==='music'?'block':'none';
 }
+
 function renderTagSelect(){
   const tags=CAT_TAGS[newCatSel]||[];
   document.getElementById('tagSelectRow').innerHTML=tags.map(t=>
@@ -671,8 +677,7 @@ async function fetchLinkTitle(){
   if(!link){ showToast('URLを入力してください'); return; }
   showToast('タイトルを取得中...');
   try{
-    const url='https://api.allorigins.win/get?url='+encodeURIComponent(link);
-    const res=await fetch(url);
+    const res=await fetch('https://api.allorigins.win/get?url='+encodeURIComponent(link));
     const data=await res.json();
     const match=data.contents.match(/<title[^>]*>([^<]+)<\/title>/i);
     if(match&&match[1]){
@@ -685,63 +690,108 @@ async function fetchLinkTitle(){
   } catch(e){ showToast('取得失敗。手動で入力してください'); }
 }
 
-// ===== 簡易フリガナ推測（カタカナ変換） =====
+// ===== 簡易フリガナ推測（ひらがな→カタカナ） =====
 function guessYomi(text){
-  // ひらがな→カタカナ変換
-  return text.replace(/[\u3041-\u3096]/g, ch=>
-    String.fromCharCode(ch.charCodeAt(0)+0x60)
-  );
+  return text.replace(/[\u3041-\u3096]/g, ch=>String.fromCharCode(ch.charCodeAt(0)+0x60));
 }
 
-// ===== 画像選択・OCR（Tesseract.js v2対応） =====
+// ===== 画像選択＆トリミング処理 =====
 function handleImageSelect(event){
   const file=event.target.files[0];
   if(!file) return;
+  event.target.value='';
   const reader=new FileReader();
   reader.onload=function(e){
-    const preview=document.getElementById('ocrPreview');
-    const img=document.getElementById('ocrPreviewImg');
-    const status=document.getElementById('ocrStatus');
-    img.src=e.target.result;
-    preview.style.display='block';
-    status.textContent='🔍 テキストを読み取り中...';
-
-    if(typeof Tesseract!=='undefined'){
-      // Tesseract.js v2 API
-      Tesseract.recognize(
-        e.target.result,
-        'jpn+eng',
-        {
-          logger: m=>{
-            if(m.status==='recognizing text'){
-              status.textContent='🔍 読み取り中... '+Math.round(m.progress*100)+'%';
-            }
-          }
-        }
-      ).then(({data:{text}})=>{
-        const lines=text.split('\n').map(l=>l.trim()).filter(l=>l.length>1);
-        if(lines.length>0){
-          const extracted=lines[0];
-          document.getElementById('newTitle').value=extracted;
-          // 読み仮名を自動推測（ひらがな→カタカナ）
-          const yomiGuess=guessYomi(extracted);
-          if(yomiGuess!==extracted){
-            document.getElementById('newYomi').value=yomiGuess;
-          }
-          status.textContent='✅ 抽出完了！タイトルと読み仮名を確認・編集してください';
-          showToast('テキスト抽出完了！');
-        } else {
-          status.textContent='⚠️ テキストが読み取れませんでした。手動で入力してください';
-        }
-      }).catch(()=>{
-        status.textContent='⚠️ 読み取りに失敗しました。手動で入力してください';
-      });
-    } else {
-      status.textContent='⚠️ AI抽出機能はオフラインでは使えません。手動で入力してください';
-    }
+    openCropModal(e.target.result);
   };
   reader.readAsDataURL(file);
-  event.target.value='';
+}
+
+// ===== トリミングモーダル =====
+function openCropModal(dataUrl){
+  const overlay=document.getElementById('cropOverlay');
+  const img=document.getElementById('cropImage');
+  // 既存のCropperを破棄
+  if(cropperInstance){ cropperInstance.destroy(); cropperInstance=null; }
+  img.src=dataUrl;
+  overlay.style.display='flex';
+  // 画像ロード後にCropper初期化
+  img.onload=function(){
+    cropperInstance=new Cropper(img,{
+      aspectRatio: 1,
+      viewMode: 1,
+      dragMode: 'move',
+      autoCropArea: 0.8,
+      restore: false,
+      guides: true,
+      center: true,
+      highlight: false,
+      cropBoxMovable: true,
+      cropBoxResizable: true,
+      toggleDragModeOnDblclick: false,
+    });
+  };
+}
+function cancelCrop(){
+  if(cropperInstance){ cropperInstance.destroy(); cropperInstance=null; }
+  document.getElementById('cropOverlay').style.display='none';
+}
+function confirmCrop(){
+  if(!cropperInstance) return;
+  // トリミングした画像をcanvasから取得（400x400px）
+  const canvas=cropperInstance.getCroppedCanvas({width:400,height:400});
+  const croppedDataUrl=canvas.toDataURL('image/jpeg',0.85);
+
+  // プレビューに反映
+  const img=document.getElementById('ocrPreviewImg');
+  img.src=croppedDataUrl;
+  document.getElementById('ocrPreview').style.display='block';
+
+  // OCRを実行（Tesseract.js）
+  const status=document.getElementById('ocrStatus');
+  status.textContent='🔍 テキストを読み取り中...';
+  runOCR(croppedDataUrl, status);
+
+  cropperInstance.destroy(); cropperInstance=null;
+  document.getElementById('cropOverlay').style.display='none';
+}
+
+// ===== OCR（Tesseract.js 動的読み込み） =====
+function runOCR(dataUrl, statusEl){
+  function doRecognize(){
+    Tesseract.recognize(dataUrl,'eng+jpn',{
+      logger: m=>{
+        if(m.status==='recognizing text'){
+          statusEl.textContent='🔍 読み取り中... '+Math.round(m.progress*100)+'%';
+        }
+      }
+    }).then(({data:{text}})=>{
+      const lines=text.split('\n').map(l=>l.trim()).filter(l=>l.length>1);
+      if(lines.length>0){
+        const extracted=lines[0];
+        document.getElementById('newTitle').value=extracted;
+        const yomi=guessYomi(extracted);
+        if(yomi!==extracted) document.getElementById('newYomi').value=yomi;
+        statusEl.textContent='✅ 抽出完了！タイトルを確認・編集してください';
+        showToast('テキスト抽出完了！');
+      } else {
+        statusEl.textContent='⚠️ テキストが読み取れませんでした';
+      }
+    }).catch(()=>{
+      statusEl.textContent='⚠️ 読み取りに失敗しました。手動で入力してください';
+    });
+  }
+
+  if(typeof Tesseract!=='undefined'){
+    doRecognize();
+  } else {
+    // 動的読み込み
+    const s=document.createElement('script');
+    s.src='https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js';
+    s.onload=doRecognize;
+    s.onerror=()=>{ statusEl.textContent='⚠️ OCR機能はオフラインでは使えません'; };
+    document.head.appendChild(s);
+  }
 }
 
 // ===== アイテム保存 =====
@@ -758,7 +808,7 @@ function saveItem(){
     if(item){
       item.title=title; item.yomi=yomi; item.cat=newCatSel; item.tags=[...newTagSel];
       item.link=link||undefined;
-      item.image=image||undefined;
+      item.image=image||item.image||undefined;
       if(newCatSel!=='interest') item.status=document.getElementById('statusSelect').value;
       if(newCatSel==='music')    item.type=document.getElementById('typeSelect').value;
       if(newCatSel==='interest'){
@@ -810,7 +860,7 @@ function toggleCatVisibility(id){
   saveData(); renderCatToggleList();
 }
 
-// ===== タグ管理（並び替え対応） =====
+// ===== タグ管理（▲▼ボタン） =====
 function renderTagManageList(){
   let html='';
   ALL_CATS.forEach(c=>{
@@ -820,9 +870,8 @@ function renderTagManageList(){
       html+=`<div style="font-size:13px;color:var(--text3);padding:6px 4px 4px;">タグなし</div>`;
     } else {
       tags.forEach((t,idx)=>{
-        const safeT=t.replace(/'/g,"\'");
-        const isFirst=idx===0;
-        const isLast=idx===tags.length-1;
+        const safeT=t.replace(/'/g,"\\'");
+        const isFirst=idx===0, isLast=idx===tags.length-1;
         html+=`<div class="tag-manage-row">
           <span class="tag-manage-name">${t}</span>
           <div class="tag-move-btns">
@@ -840,19 +889,14 @@ function renderTagManageList(){
   });
   document.getElementById('tagManageList').innerHTML=html;
 }
-// ===== タグ上下ボタン並び替え =====
+
 function moveTag(catId, idx, dir){
-  const arr = CAT_TAGS[catId];
+  const arr=CAT_TAGS[catId];
   if(!arr) return;
-  const newIdx = idx + dir;
-  if(newIdx < 0 || newIdx >= arr.length) return;
-  // 入れ替え
-  const tmp = arr[idx];
-  arr[idx] = arr[newIdx];
-  arr[newIdx] = tmp;
-  saveData();
-  renderTagManageList();
-  renderTagRow();
+  const newIdx=idx+dir;
+  if(newIdx<0||newIdx>=arr.length) return;
+  const tmp=arr[idx]; arr[idx]=arr[newIdx]; arr[newIdx]=tmp;
+  saveData(); renderTagManageList(); renderTagRow();
 }
 
 function confirmTagDelete(catId,tag){
