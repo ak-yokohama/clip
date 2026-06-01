@@ -1,29 +1,22 @@
-// バージョンを上げるたびに古いキャッシュが自動削除される
-const CACHE = 'mastershelf-v1';
-
-self.addEventListener('install', e => {
-  // 即座に新しいSWを有効化（待機しない）
+// Service Worker - キャッシュ完全無効版
+// インストール時に即座に有効化
+self.addEventListener('install', () => {
   self.skipWaiting();
 });
 
+// 有効化時に古いキャッシュをすべて削除
 self.addEventListener('activate', e => {
   e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.map(k => {
-        console.log('Deleting cache:', k);
-        return caches.delete(k);
-      }))
-    ).then(() => self.clients.claim())
+    caches.keys()
+      .then(keys => Promise.all(keys.map(k => caches.delete(k))))
+      .then(() => self.clients.claim())
   );
 });
 
+// fetchは常にネットワーク優先、キャッシュ一切使わない
 self.addEventListener('fetch', e => {
-  // 全リクエストを常にネットワーク優先で取得
-  // キャッシュは使わない（常に最新を取得）
   e.respondWith(
-    fetch(e.request).catch(() => {
-      // オフライン時のみキャッシュから返す
-      return caches.match(e.request);
-    })
+    fetch(e.request, { cache: 'no-store' })
+      .catch(() => new Response('オフライン中です', { status: 503 }))
   );
 });

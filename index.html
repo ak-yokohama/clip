@@ -13,7 +13,6 @@
 <title>The MasterShelf</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
-<!-- Cropper.js（画像トリミング） -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <style>
@@ -26,28 +25,37 @@
 }
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;overflow:hidden;}
 #app{height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;background:var(--bg);}
-.header{display:flex;align-items:center;justify-content:space-between;padding:52px 20px 12px;background:var(--bg);flex-shrink:0;}
+.header{display:flex;align-items:center;justify-content:flex-start;padding:52px 20px 10px;background:var(--bg);flex-shrink:0;position:relative;}
 .header-logo{height:52px;width:auto;display:block;}
-.header-icons{display:flex;gap:18px;align-items:center;}
-.icon-btn{background:transparent;border:none;color:var(--text2);cursor:pointer;padding:12px;display:flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;}
-.icon-btn svg{width:26px;height:26px;}
-.cat-tabs{display:flex;gap:4px;padding:0 10px 10px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;justify-content:space-between;}
+.header-icons{position:absolute;top:8px;right:8px;display:flex;gap:4px;align-items:center;}
+.icon-btn{background:transparent;border:none;color:var(--text2);cursor:pointer;padding:8px;display:flex;align-items:center;justify-content:center;min-width:36px;min-height:36px;}
+.icon-btn svg{width:22px;height:22px;}
+/* 大項目タブ */
+.cat-tabs{display:flex;gap:4px;padding:0 10px 8px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;justify-content:space-between;}
 .cat-tabs::-webkit-scrollbar{display:none;}
 .cat-tab{display:flex;align-items:center;gap:3px;padding:7px 9px;border-radius:20px;border:1.5px solid var(--border);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;white-space:nowrap;font-family:'Noto Sans JP',sans-serif;transition:all .15s;}
 .cat-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:500;}
-.tag-row{display:flex;gap:6px;padding:0 14px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-shrink:0;}
+/* 中項目タブ */
+.sub-tabs{display:flex;gap:5px;padding:0 10px 8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-shrink:0;}
+.sub-tabs::-webkit-scrollbar{display:none;}
+.sub-tabs.hidden{padding:0;max-height:0;overflow:hidden;}
+.sub-tab{padding:5px 12px;border-radius:16px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:12px;cursor:pointer;white-space:nowrap;font-family:'Noto Sans JP',sans-serif;transition:all .15s;}
+.sub-tab.active{background:var(--surface2);border-color:var(--accent2);color:var(--accent2);font-weight:500;}
+/* タグ行 */
+.tag-row{display:flex;gap:6px;padding:0 10px 8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-shrink:0;}
 .tag-row::-webkit-scrollbar{display:none;}
 .tag-row.hidden{padding:0;max-height:0;overflow:hidden;}
-.tag-chip{padding:6px 13px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:12px;cursor:pointer;white-space:nowrap;font-family:'Noto Sans JP',sans-serif;}
+.tag-chip{padding:5px 11px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:11px;cursor:pointer;white-space:nowrap;font-family:'Noto Sans JP',sans-serif;}
 .tag-chip.active{background:var(--surface2);border-color:var(--accent2);color:var(--accent2);}
 .tag-chip.add-tag{color:var(--accent);border-color:var(--accent);border-style:dashed;}
+/* ソートバー */
 .sort-bar{display:flex;align-items:center;gap:7px;padding:0 14px 8px;flex-shrink:0;}
 .sort-label{font-size:11px;color:var(--text3);}
 .sort-btn{padding:5px 11px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:11px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;}
 .sort-btn.active{background:var(--surface2);border-color:var(--text2);color:var(--text);}
+/* リスト */
 .list-area{flex:1;padding:0 12px 80px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .item-card{display:flex;align-items:stretch;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;overflow:hidden;position:relative;touch-action:pan-y;}
-.item-card.dragging{opacity:.75;border-color:var(--accent);box-shadow:0 8px 28px rgba(124,110,250,.3);}
 .item-card.drag-over-top::before{content:'';position:absolute;top:-4px;left:0;right:0;height:3px;background:var(--accent);border-radius:2px;z-index:1;}
 .item-card.drag-over-bottom::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:3px;background:var(--accent);border-radius:2px;z-index:1;}
 .drag-handle{display:flex;align-items:center;justify-content:center;width:36px;min-height:80px;color:var(--text3);background:var(--bg3);cursor:grab;flex-shrink:0;touch-action:none;}
@@ -58,6 +66,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
 .item-title-wrap{flex:1;min-width:0;}
 .item-title{font-size:14px;font-weight:500;color:var(--text);line-height:1.35;}
 .item-yomi{font-size:11px;color:var(--text3);margin-top:2px;}
+.item-sub{font-size:11px;color:var(--accent2);margin-top:2px;}
 .item-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;}
 .status-badge{padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500;}
 .badge-free{background:rgba(63,186,122,.15);color:#3FBA7A;}
@@ -76,7 +85,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
 .delete-btn svg{width:15px;height:15px;}
 .fab{position:fixed;bottom:24px;right:24px;width:60px;height:60px;border-radius:30px;background:var(--accent);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(124,110,250,.45);z-index:50;}
 .fab svg{width:28px;height:28px;}
-/* モーダル共通 */
+/* モーダル */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;display:flex;align-items:flex-end;justify-content:center;}
 .modal{background:var(--bg2);border-radius:20px 20px 0 0;padding:20px 20px 36px;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
@@ -117,28 +126,44 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
 .toggle.on{background:var(--accent);}
 .toggle::after{content:'';position:absolute;width:21px;height:21px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform .2s;}
 .toggle.on::after{transform:translateX(19px);}
+/* 設定：大項目並び替え */
+.cat-manage-row{display:flex;align-items:center;padding:11px 14px;background:var(--surface);border-radius:var(--radiusSm);margin-bottom:6px;gap:8px;}
+.cat-manage-name{font-size:14px;flex:1;}
+.cat-move-btns{display:flex;gap:5px;flex-shrink:0;}
+.cat-move-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:6px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;}
+.cat-move-btn:active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.cat-move-btn:disabled{opacity:.2;cursor:default;}
+/* 設定：中項目・タグ */
+.sub-section-label{font-size:13px;font-weight:700;color:var(--text);margin:16px 0 6px 2px;padding:8px 12px;background:var(--bg3);border-radius:var(--radiusSm);}
+.sub-cat-label{font-size:12px;font-weight:500;color:var(--accent2);margin:10px 0 6px 4px;}
+.sub-manage-row{display:flex;align-items:center;padding:9px 12px;background:var(--surface);border-radius:var(--radiusSm);margin-bottom:5px;gap:6px;}
+.sub-manage-name{font-size:13px;color:var(--text2);flex:1;}
+.sub-move-btns{display:flex;gap:4px;flex-shrink:0;}
+.sub-move-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:5px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;}
+.sub-move-btn:active{background:var(--accent);color:#fff;}
+.sub-move-btn:disabled{opacity:.2;cursor:default;}
+.sub-del-btn{background:transparent;border:1px solid var(--border);color:var(--text3);border-radius:5px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+.sub-del-btn svg{width:13px;height:13px;}
 /* タグ管理 */
-.tag-section-label{font-size:13px;font-weight:500;color:var(--accent2);margin:16px 0 8px 2px;}
-.tag-manage-row{display:flex;align-items:center;padding:10px 14px;background:var(--surface);border-radius:var(--radiusSm);margin-bottom:6px;gap:6px;}
-.tag-manage-name{font-size:14px;color:var(--text2);flex:1;}
-.tag-move-btns{display:flex;flex-direction:row;gap:6px;flex-shrink:0;}
-.tag-move-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:6px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0;}
+.tag-section-label{font-size:12px;color:var(--accent2);margin:8px 0 5px 2px;font-style:italic;}
+.tag-manage-row{display:flex;align-items:center;padding:8px 12px;background:var(--surface);border-radius:var(--radiusSm);margin-bottom:5px;gap:6px;}
+.tag-manage-name{font-size:13px;color:var(--text2);flex:1;}
+.tag-move-btns{display:flex;flex-direction:row;gap:5px;flex-shrink:0;}
+.tag-move-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:5px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;flex-shrink:0;}
 .tag-move-btn:active{background:var(--accent);color:#fff;border-color:var(--accent);}
 .tag-move-btn:disabled{opacity:.2;cursor:default;}
-.tag-del-btn{background:transparent;border:1px solid var(--border);color:var(--text3);border-radius:6px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
-.tag-del-btn svg{width:14px;height:14px;}
-.add-tag-row{display:flex;gap:8px;margin-top:8px;margin-bottom:4px;}
-.add-tag-input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--radiusSm);color:var(--text);padding:10px 12px;font-size:14px;outline:none;font-family:'Noto Sans JP',sans-serif;}
-.add-tag-input:focus{border-color:var(--accent);}
-.add-tag-btn{padding:10px 16px;background:var(--accent);border:none;border-radius:var(--radiusSm);color:#fff;font-size:13px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;}
-/* アプリ更新ボタン */
+.tag-del-btn{background:transparent;border:1px solid var(--border);color:var(--text3);border-radius:5px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+.tag-del-btn svg{width:13px;height:13px;}
+.add-row{display:flex;gap:8px;margin-top:8px;margin-bottom:6px;}
+.add-input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--radiusSm);color:var(--text);padding:9px 12px;font-size:13px;outline:none;font-family:'Noto Sans JP',sans-serif;}
+.add-input:focus{border-color:var(--accent);}
+.add-btn{padding:9px 14px;background:var(--accent);border:none;border-radius:var(--radiusSm);color:#fff;font-size:12px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;}
+/* 更新・リセット */
 .update-section{margin-top:8px;padding:16px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);}
 .update-desc{font-size:12px;color:var(--text3);margin-bottom:12px;line-height:1.6;}
 .update-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),#5B4FD9);border:none;border-radius:var(--radiusSm);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;}
-.update-btn:active{opacity:.85;}
-.reset-btn{width:100%;padding:14px;background:transparent;border:1px solid var(--coral);border-radius:var(--radiusSm);color:var(--coral);font-size:14px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;margin-top:10px;}
-.reset-btn:active{background:rgba(240,96,96,.1);}
 .update-btn svg{width:18px;height:18px;}
+.reset-btn{width:100%;padding:14px;background:transparent;border:1px solid var(--coral);border-radius:var(--radiusSm);color:var(--coral);font-size:14px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;margin-top:10px;}
 /* Toast */
 .toast{position:fixed;top:64px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:11px 22px;border-radius:8px;font-size:13px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
 .toast.show{opacity:1;}
@@ -150,12 +175,15 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
 .item-link svg{width:11px;height:11px;flex-shrink:0;}
 .link-input-row{display:flex;gap:6px;margin-bottom:14px;}
 .link-input-row input{flex:1;}
-.link-fetch-btn{padding:0 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radiusSm);color:var(--accent2);font-size:13px;cursor:pointer;white-space:nowrap;font-family:'Noto Sans JP',sans-serif;}
+
 .image-preview-wrap{position:relative;margin-bottom:14px;}
 .image-preview-wrap img{width:100%;max-height:140px;object-fit:cover;border-radius:var(--radiusSm);}
 .image-preview-del{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.6);border:none;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;}
-/* OCRステータス */
 .ocr-status{font-size:12px;color:var(--accent2);padding:4px 2px;margin-bottom:10px;}
+.add-link-btn{width:100%;padding:10px;border:1.5px dashed var(--border);border-radius:var(--radiusSm);background:transparent;color:var(--accent2);font-size:13px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;margin-bottom:14px;display:block;}
+.link-row{display:flex;gap:6px;margin-bottom:8px;align-items:center;}
+.link-row input{flex:1;margin-bottom:0;}
+.link-row-del{background:transparent;border:1px solid var(--border);color:var(--text3);border-radius:var(--radiusSm);width:32px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:16px;}
 /* トリミングモーダル */
 .crop-overlay{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:300;display:flex;flex-direction:column;}
 .crop-header{display:flex;align-items:center;justify-content:space-between;padding:52px 16px 12px;flex-shrink:0;}
@@ -181,8 +209,12 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
       </button>
     </div>
   </div>
+  <!-- 大項目タブ -->
   <div class="cat-tabs" id="catTabs"></div>
-  <div class="tag-row" id="tagRow"></div>
+  <!-- 中項目タブ -->
+  <div class="sub-tabs hidden" id="subTabs"></div>
+  <!-- タグ行 -->
+  <div class="tag-row hidden" id="tagRow"></div>
   <div class="sort-bar">
     <span class="sort-label">並び順:</span>
     <button class="sort-btn active" data-sort="custom" onclick="setSort('custom')">登録順</button>
@@ -208,11 +240,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
         </svg>
       </button>
     </div>
-    <!-- 画像・URL入力エリア（新規・編集共通で常に表示） -->
     <div id="ocrBtnArea">
-      <label class="upload-btn" for="screenshotInput">
-        🖼️ ギャラリーから画像・スクショを選択
-      </label>
+      <label class="upload-btn" for="screenshotInput">🖼️ ギャラリーから画像を選択</label>
       <input type="file" id="screenshotInput" accept="image/*" style="display:none;" onchange="handleImageSelect(event)" />
       <div id="ocrPreview" style="display:none;margin-bottom:12px;">
         <div class="image-preview-wrap">
@@ -222,17 +251,19 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
         <div id="ocrStatus" class="ocr-status"></div>
       </div>
       <label class="form-label">URLリンク（任意）</label>
-      <div class="link-input-row">
-        <input class="form-input" id="newLink" placeholder="https://..." style="margin-bottom:0;" />
-        <button class="link-fetch-btn" onclick="fetchLinkTitle()">取得</button>
-      </div>
+      <div id="linkInputsArea"></div>
+      <button class="add-link-btn" onclick="addLinkInput()">＋ リンクを追加</button>
     </div>
     <label class="form-label">タイトル</label>
-    <input class="form-input" id="newTitle" placeholder="例: ソニー ワイヤレスイヤホン WH-1000XM5" />
-    <label class="form-label">読み仮名（任意・Alexaに話しかけるとき用）</label>
-    <input class="form-input" id="newYomi" placeholder="例: ソニー ワイヤレスイヤホン" />
+    <input class="form-input" id="newTitle" placeholder="タイトルを入力" />
+    <label class="form-label">読み仮名（任意）</label>
+    <input class="form-input" id="newYomi" placeholder="よみがな" />
     <label class="form-label">大項目</label>
     <div class="cat-select-row" id="catSelectRow"></div>
+    <div id="subCatSection" style="display:none;">
+      <label class="form-label">中項目（任意）</label>
+      <div class="cat-select-row" id="subCatSelectRow"></div>
+    </div>
     <div id="statusSection">
       <label class="form-label">状態</label>
       <select class="form-select" id="statusSelect"></select>
@@ -256,7 +287,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
         </div>
       </div>
     </div>
-    <label class="form-label">シチュエーションタグ</label>
+    <label class="form-label">タグ（任意）</label>
     <div class="cat-select-row" id="tagSelectRow"></div>
     <button class="submit-btn" onclick="saveItem()">保存する</button>
   </div>
@@ -274,14 +305,14 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
   </div>
 </div>
 
-<!-- タグ削除確認（z-index:300） -->
-<div class="confirm-overlay" id="tagConfirmOverlay" style="display:none;z-index:300;">
+<!-- 汎用確認ダイアログ -->
+<div class="confirm-overlay" id="genericConfirmOverlay" style="display:none;z-index:300;">
   <div class="confirm-box">
-    <div class="confirm-title">このタグを削除しますか？</div>
-    <div class="confirm-name" id="tagConfirmName"></div>
+    <div class="confirm-title" id="genericConfirmTitle">削除しますか？</div>
+    <div class="confirm-name" id="genericConfirmName"></div>
     <div class="confirm-btns">
-      <button class="confirm-cancel" onclick="closeTagConfirm()">キャンセル</button>
-      <button class="confirm-del" onclick="executeTagDelete()">削除する</button>
+      <button class="confirm-cancel" onclick="closeGenericConfirm()">キャンセル</button>
+      <button class="confirm-del" onclick="executeGenericConfirm()">削除する</button>
     </div>
   </div>
 </div>
@@ -290,30 +321,28 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
 <div class="settings-overlay" id="settingsOverlay" style="display:none;">
   <div class="settings-header">
     <button class="settings-back" onclick="closeSettings()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="15 18 9 12 15 6"/>
-      </svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
     </button>
     <span class="settings-title">設定</span>
   </div>
   <div class="settings-body">
     <div class="settings-section">
-      <div class="settings-section-title">大項目の表示 / 非表示</div>
-      <div id="catToggleList"></div>
+      <div class="settings-section-title">大項目の並び替え・表示設定</div>
+      <div id="catManageList"></div>
     </div>
     <div class="settings-section">
-      <div class="settings-section-title">タグの管理</div>
-      <div id="tagManageList"></div>
+      <div class="settings-section-title">中項目・タグの管理</div>
+      <div id="subTagManageList"></div>
     </div>
     <div class="settings-section">
       <div class="settings-section-title">アプリの更新</div>
       <div class="update-section">
-        <div class="update-desc">データを保持したまま、アプリを最新バージョンに更新します。GitHubに新しいバージョンをアップした後にタップしてください。</div>
+        <div class="update-desc">データを保持したまま最新バージョンに更新します。</div>
         <button class="update-btn" onclick="updateAppVersion()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.45"/></svg>
           アプリを最新版に更新
         </button>
-        <button class="reset-btn" onclick="confirmResetData()">⚠️ サンプルデータを削除してリセット</button>
+        <button class="reset-btn" onclick="confirmResetData()">⚠️ データをすべてリセット</button>
       </div>
     </div>
   </div>
@@ -321,12 +350,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
 
 <!-- トリミングモーダル -->
 <div class="crop-overlay" id="cropOverlay" style="display:none;">
-  <div class="crop-header">
-    <span class="crop-title">✂️ 切り抜き範囲を選択</span>
-  </div>
-  <div class="crop-body">
-    <img id="cropImage" alt="crop" />
-  </div>
+  <div class="crop-header"><span class="crop-title">✂️ 切り抜き範囲を選択</span></div>
+  <div class="crop-body"><img id="cropImage" alt="crop" /></div>
   <div class="crop-footer">
     <button class="crop-cancel-btn" onclick="cancelCrop()">キャンセル</button>
     <button class="crop-confirm-btn" onclick="confirmCrop()">この範囲で保存</button>
@@ -343,60 +368,106 @@ const SVG_EDIT  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" st
 const SVG_TRASH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>`;
 
 // ===== 定数 =====
-const ALL_CATS = [
-  {id:'music',    label:'音楽',   emoji:'🎵'},
-  {id:'movie',    label:'映画',   emoji:'🎬'},
-  {id:'book',     label:'読書',   emoji:'📚'},
-  {id:'interest', label:'関心',   emoji:'✨'},
-  {id:'other',    label:'その他', emoji:'📦'},
+const DEFAULT_CATS = [
+  {id:'music',  label:'音楽', emoji:'🎵'},
+  {id:'movie',  label:'映画', emoji:'🎬'},
+  {id:'book',   label:'読書', emoji:'📚'},
+  {id:'video',  label:'動画', emoji:'🎞️'},
+  {id:'other',  label:'その他',emoji:'📦'},
 ];
-// 状態区分（全カテゴリに「不明」追加）
+const DEFAULT_SUB_CATS = {
+  music: ['ROCK','JAZZ','POP','クラシック','J-POP'],
+  movie: ['洋画','邦画'],
+  book:  ['書籍','雑誌','漫画'],
+  video: ['教養','趣味','ドラマ','アニメ'],
+  other: ['飲食','ファッション','レジャー','旅行','人物'],
+};
+const DEFAULT_TAGS = {
+  music: {
+    'ROCK':['#洋楽','#ハードロック','#インディー'],
+    'JAZZ':['#スタンダード','#フュージョン'],
+    'POP': ['#洋楽','#ポップス'],
+    'クラシック':['#オーケストラ','#ピアノ'],
+    'J-POP':['#邦楽','#アイドル'],
+  },
+  movie: {
+    '洋画':['#アクション','#SF','#ラブストーリー'],
+    '邦画':['#邦画','#アニメ映画'],
+  },
+  book: {
+    '書籍':['#ビジネス','#小説','#自己啓発'],
+    '雑誌':['#週刊誌','#ファッション誌'],
+    '漫画':['#少年','#少女','#青年'],
+  },
+  video: {
+    '教養':['#科学','#歴史','#語学'],
+    '趣味':['#料理','#DIY','#旅行'],
+    'ドラマ':['#海外ドラマ','#国内ドラマ'],
+    'アニメ':['#深夜アニメ','#子供向け'],
+  },
+  other: {
+    '飲食':['#レストラン','#カフェ','#レシピ'],
+    'ファッション':['#メンズ','#レディース'],
+    'レジャー':['#アウトドア','#スポーツ'],
+    '旅行':['#国内','#海外'],
+    '人物':['#著名人','#友人'],
+  },
+};
 const STATUS_OPTIONS = {
-  music:    [{v:'free',l:'無料'},{v:'paid',l:'有料'},{v:'unknown',l:'不明'}],
-  movie:    [{v:'free',l:'無料'},{v:'paid',l:'有料'},{v:'unknown',l:'不明'}],
-  other:    [{v:'free',l:'無料'},{v:'paid',l:'有料'},{v:'unknown',l:'不明'}],
-  book:     [{v:'free',l:'無料'},{v:'general',l:'一般'},{v:'unknown',l:'不明'}],
-  interest: [],
+  music:  [{v:'free',l:'無料'},{v:'paid',l:'有料'},{v:'unknown',l:'不明'}],
+  movie:  [{v:'free',l:'無料'},{v:'paid',l:'有料'},{v:'unknown',l:'不明'}],
+  book:   [{v:'free',l:'無料'},{v:'general',l:'一般'},{v:'unknown',l:'不明'}],
+  video:  [{v:'free',l:'無料'},{v:'paid',l:'有料'},{v:'unknown',l:'不明'}],
+  other:  [],
 };
 
 // ===== localStorage =====
 function saveData(){
   try{
-    localStorage.setItem('clip_items',  JSON.stringify(items));
-    localStorage.setItem('clip_tags',   JSON.stringify(CAT_TAGS));
-    localStorage.setItem('clip_hidden', JSON.stringify([...hiddenCats]));
+    localStorage.setItem('ms_items',    JSON.stringify(items));
+    localStorage.setItem('ms_cats',     JSON.stringify(cats));
+    localStorage.setItem('ms_subcats',  JSON.stringify(subCats));
+    localStorage.setItem('ms_tags',     JSON.stringify(tags));
+    localStorage.setItem('ms_hidden',   JSON.stringify([...hiddenCats]));
   }catch(e){}
 }
 function loadData(){
   try{
-    const si=localStorage.getItem('clip_items');  if(si) items=JSON.parse(si);
-    const st=localStorage.getItem('clip_tags');   if(st) CAT_TAGS=JSON.parse(st);
-    const sh=localStorage.getItem('clip_hidden'); if(sh) hiddenCats=new Set(JSON.parse(sh));
+    const si=localStorage.getItem('ms_items');   if(si) items=JSON.parse(si);
+    const sc=localStorage.getItem('ms_cats');    if(sc) cats=JSON.parse(sc);
+    const ss=localStorage.getItem('ms_subcats'); if(ss) subCats=JSON.parse(ss);
+    const st=localStorage.getItem('ms_tags');    if(st) tags=JSON.parse(st);
+    const sh=localStorage.getItem('ms_hidden');  if(sh) hiddenCats=new Set(JSON.parse(sh));
   }catch(e){}
 }
 
 // ===== 状態変数 =====
 let hiddenCats = new Set();
-let CAT_TAGS = {
-  music:    ['#朝用','#ディナー','#テンションアップ','#邦楽','#海外'],
-  movie:    ['#土日用','#ディナー','#海外'],
-  book:     ['#土日用','#集中'],
-  interest: ['#ガジェット','#ファッション','#食品'],
-  other:    ['#メモ','#その他'],
-};
-let items = [];
-let activeCat = 'music';
-let activeTags = new Set();
-let sortMode = 'custom';
-let editingId = null;
-let newCatSel = 'music', newTagSel = new Set();
+let cats    = DEFAULT_CATS.map(c=>({...c}));
+let subCats = JSON.parse(JSON.stringify(DEFAULT_SUB_CATS));
+let tags    = JSON.parse(JSON.stringify(DEFAULT_TAGS));
+let items   = [];
+
+let activeCat    = 'music';
+let activeSubCat = null;   // nullは「すべて」
+let activeTags   = new Set();
+let sortMode     = 'custom';
+let editingId    = null;
+let newCatSel    = 'music';
+let newSubCatSel = null;
+let newTagSel    = new Set();
 let pendingDeleteId = null;
-let pendingDeleteTag = null, pendingDeleteTagCat = null;
+let genericConfirmCallback = null;
 let cropperInstance = null;
 
 // ===== ヘルパー =====
-function visibleCats(){ return ALL_CATS.filter(c=>!hiddenCats.has(c.id)); }
-function catEmoji(c){ return ALL_CATS.find(x=>x.id===c)?.emoji||'📦'; }
+function visibleCats(){ return cats.filter(c=>!hiddenCats.has(c.id)); }
+function catById(id){ return cats.find(c=>c.id===id)||{emoji:'📦',label:''}; }
+function getSubCats(catId){ return subCats[catId]||[]; }
+function getTags(catId, subCat){
+  if(!subCat) return [];
+  return (tags[catId]&&tags[catId][subCat])||[];
+}
 
 function statusBadge(s){
   if(!s||s==='unknown') return '<span class="status-badge badge-unknown">不明</span>';
@@ -411,33 +482,63 @@ function deadlineBadge(d){
   const col=days<=3?'var(--coral)':days<=7?'var(--amber)':'var(--text2)';
   return `<span class="item-deadline" style="color:${col}">🔔 ${d}（${days}日後）</span>`;
 }
+function guessYomi(text){
+  return text.replace(/[\u3041-\u3096]/g,ch=>String.fromCharCode(ch.charCodeAt(0)+0x60));
+}
 
 // ===== 描画 =====
 function renderCatTabs(){
-  const cats=visibleCats();
-  if(!cats.find(c=>c.id===activeCat)) activeCat=cats[0]?.id||'music';
-  document.getElementById('catTabs').innerHTML=cats.map(c=>
+  const vc=visibleCats();
+  if(!vc.find(c=>c.id===activeCat)){
+    activeCat=vc[0]?.id||'music';
+    activeSubCat=null; activeTags.clear();
+  }
+  document.getElementById('catTabs').innerHTML=vc.map(c=>
     `<button class="cat-tab${activeCat===c.id?' active':''}" onclick="setCat('${c.id}')">${c.emoji} ${c.label}</button>`
   ).join('');
 }
+
+function renderSubTabs(){
+  const subs=getSubCats(activeCat);
+  const el=document.getElementById('subTabs');
+  if(!subs.length){ el.innerHTML=''; el.classList.add('hidden'); return; }
+  el.classList.remove('hidden');
+  // 「すべて」ボタン＋各中項目
+  let html=`<button class="sub-tab${activeSubCat===null?' active':''}" onclick="setSubCat(null)">すべて</button>`;
+  subs.forEach(s=>{
+    html+=`<button class="sub-tab${activeSubCat===s?' active':''}" onclick="setSubCat('${s.replace(/'/g,"\\'")}')">${s}</button>`;
+  });
+  el.innerHTML=html;
+}
+
 function renderTagRow(){
-  const tags=CAT_TAGS[activeCat]||[];
-  const row=document.getElementById('tagRow');
-  if(!tags.length){ row.innerHTML=''; row.classList.add('hidden'); return; }
-  row.classList.remove('hidden');
-  row.innerHTML=tags.map(t=>
-    `<button class="tag-chip${activeTags.has(t)?' active':''}" onclick="toggleTag('${t}')">${t}</button>`
+  const tagList=getTags(activeCat, activeSubCat);
+  const el=document.getElementById('tagRow');
+  if(!tagList.length){ el.innerHTML=''; el.classList.add('hidden'); return; }
+  el.classList.remove('hidden');
+  el.innerHTML=tagList.map(t=>
+    `<button class="tag-chip${activeTags.has(t)?' active':''}" onclick="toggleTag('${t.replace(/'/g,"\\'")}')">${t}</button>`
   ).join('')+`<button class="tag-chip add-tag" onclick="addTagFromRow()">＋ タグ</button>`;
 }
-function setCat(id){ activeCat=id; activeTags.clear(); renderCatTabs(); renderTagRow(); renderList(); }
+
+function setCat(id){
+  activeCat=id; activeSubCat=null; activeTags.clear();
+  renderCatTabs(); renderSubTabs(); renderTagRow(); renderList();
+}
+function setSubCat(sub){
+  activeSubCat=sub; activeTags.clear();
+  renderSubTabs(); renderTagRow(); renderList();
+}
 function toggleTag(t){ activeTags.has(t)?activeTags.delete(t):activeTags.add(t); renderTagRow(); renderList(); }
 function setSort(m){
   sortMode=m;
   document.querySelectorAll('.sort-btn').forEach(b=>b.classList.toggle('active',b.dataset.sort===m));
   renderList();
 }
+
 function getFiltered(){
   let res=items.filter(i=>i.cat===activeCat);
+  if(activeSubCat) res=res.filter(i=>i.subCat===activeSubCat);
   if(activeTags.size>0) res=res.filter(i=>(i.tags||[]).some(t=>activeTags.has(t)));
   if(sortMode==='alpha') res.sort((a,b)=>a.title.localeCompare(b.title,'ja'));
   else if(sortMode==='deadline') res.sort((a,b)=>{
@@ -456,14 +557,16 @@ function renderList(){
     el.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 15s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg><div>＋ボタンからアイテムを追加してください</div></div>`;
     return;
   }
+  const c=catById(activeCat);
   el.innerHTML=list.map(item=>{
-    const tags=(item.tags||[]).map(t=>`<span class="item-tag">${t}</span>`).join('');
+    const tags2=(item.tags||[]).map(t=>`<span class="item-tag">${t}</span>`).join('');
     const priceStr=item.price?`<span class="item-price">¥${item.price.toLocaleString()}</span>`:'';
     const thumbHtml=item.image?`<img class="item-thumb" src="${item.image}" alt="thumb" />`:'';
-    const safeLink=item.link?item.link.replace(/"/g,'&quot;'):'';
-    const linkHtml=item.link?`<a class="item-link" href="${safeLink}" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>${item.link.length>35?item.link.substring(0,35)+'...':item.link}</a>`:'';
+    const itemLinks=(item.links&&item.links.length?item.links:(item.link?[item.link]:[])); 
+    const linkHtml=itemLinks.map(lk=>{ const sl=lk.replace(/"/g,'&quot;'); return `<a class="item-link" href="${sl}" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>${lk.length>35?lk.substring(0,35)+'...':lk}</a>`; }).join('');
     const safeTitle=item.title.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     const canAlexa=item.cat==='music'||item.cat==='movie';
+    const statusOpts=STATUS_OPTIONS[item.cat]||[];
     return `<div class="item-card" id="card-${item.id}" data-id="${item.id}">
       <div class="drag-handle" data-id="${item.id}">${SVG_GRIP}</div>
       <div class="item-body">
@@ -472,15 +575,16 @@ function renderList(){
           <div class="item-title-wrap">
             <div class="item-title">${item.title}</div>
             ${item.yomi?`<div class="item-yomi">${item.yomi}</div>`:''}
+            ${item.subCat?`<div class="item-sub">▸ ${item.subCat}</div>`:''}
             ${linkHtml}
           </div>
         </div>
         <div class="item-meta">
-          ${item.cat!=='interest'?statusBadge(item.status):''}
+          ${statusOpts.length?statusBadge(item.status):''}
           ${priceStr}
           ${item.deadline?deadlineBadge(item.deadline):''}
         </div>
-        <div class="item-tags">${tags}</div>
+        <div class="item-tags">${tags2}</div>
       </div>
       <div class="item-actions">
         ${canAlexa?`<button class="alexa-launch-btn" onclick="launchOfficialApp('${item.cat}','${safeTitle}')">${SVG_PLAY}Alexa</button>`:''}
@@ -492,100 +596,61 @@ function renderList(){
   initTouchDrag();
 }
 
-// ===== Alexa / Amazon アプリ起動 =====
-function launchOfficialApp(cat, query){
+// ===== Alexa起動 =====
+function launchOfficialApp(cat,query){
   if(!query) return;
   const q=encodeURIComponent(query);
   let url='';
-  if(cat==='music')      url=`amznmp://share?searchQuery=${q}`;
+  if(cat==='music') url=`amznmp://share?searchQuery=${q}`;
   else if(cat==='movie') url=`primevideo://search?phrase=${q}`;
   if(!url) return;
   window.location.href=url;
   setTimeout(()=>{
     if(document.hidden||document.webkitHidden) return;
     let web='';
-    if(cat==='music')      web=`https://music.amazon.co.jp/search/${q}`;
+    if(cat==='music') web=`https://music.amazon.co.jp/search/${q}`;
     else if(cat==='movie') web=`https://www.amazon.co.jp/s?k=${q}&i=instant-video`;
     if(web) window.open(web,'_blank');
   },1500);
 }
 
-// ===== タッチドラッグ（リスト並び替え）=====
+// ===== タッチドラッグ =====
 function initTouchDrag(){
   const la=document.getElementById('listArea');
   const newLa=la.cloneNode(true);
   la.parentNode.replaceChild(newLa,la);
-
-  let dragId=null, ghost=null, startY=0, origRect=null;
-
-  function getAllCards(){ return [...document.getElementById('listArea').querySelectorAll('.item-card')]; }
-  function getLA(){ return document.getElementById('listArea'); }
-
-  getLA().addEventListener('touchstart',function(e){
-    const handle=e.target.closest('.drag-handle');
-    if(!handle) return;
-    const card=handle.closest('.item-card');
-    if(!card) return;
-    dragId=parseInt(card.dataset.id);
-    origRect=card.getBoundingClientRect();
-    startY=e.touches[0].clientY;
-    ghost=card.cloneNode(true);
-    ghost.style.cssText=[
-      'position:fixed',`left:${origRect.left}px`,`top:${origRect.top}px`,
-      `width:${origRect.width}px`,'z-index:9999','opacity:0.85',
-      'pointer-events:none','border:2px solid var(--accent)',
-      'border-radius:12px','background:var(--surface)',
-      'box-shadow:0 8px 28px rgba(124,110,250,.4)','transition:none'
-    ].join(';');
-    document.body.appendChild(ghost);
-    card.style.opacity='0.25';
-    e.preventDefault();
+  let dragId=null,ghost=null,startY=0,origRect=null;
+  function cards(){ return [...document.getElementById('listArea').querySelectorAll('.item-card')]; }
+  function la2(){ return document.getElementById('listArea'); }
+  la2().addEventListener('touchstart',function(e){
+    const h=e.target.closest('.drag-handle');
+    if(!h) return;
+    const c=h.closest('.item-card'); if(!c) return;
+    dragId=parseInt(c.dataset.id); origRect=c.getBoundingClientRect(); startY=e.touches[0].clientY;
+    ghost=c.cloneNode(true);
+    ghost.style.cssText=['position:fixed',`left:${origRect.left}px`,`top:${origRect.top}px`,`width:${origRect.width}px`,'z-index:9999','opacity:0.85','pointer-events:none','border:2px solid var(--accent)','border-radius:12px','background:var(--surface)','box-shadow:0 8px 28px rgba(124,110,250,.4)'].join(';');
+    document.body.appendChild(ghost); c.style.opacity='0.25'; e.preventDefault();
   },{passive:false});
-
   document.addEventListener('touchmove',function(e){
-    if(dragId===null||!ghost) return;
-    e.preventDefault();
+    if(dragId===null||!ghost) return; e.preventDefault();
     const ty=e.touches[0].clientY;
     ghost.style.top=(origRect.top+(ty-startY))+'px';
-    getAllCards().forEach(c=>c.classList.remove('drag-over-top','drag-over-bottom'));
-    const ghostCY=origRect.top+(ty-startY)+origRect.height/2;
-    const target=getAllCards().find(c=>{
-      if(parseInt(c.dataset.id)===dragId) return false;
-      const r=c.getBoundingClientRect();
-      return ghostCY>=r.top&&ghostCY<=r.bottom;
-    });
-    if(target){
-      const tr=target.getBoundingClientRect();
-      target.classList.add(ghostCY<tr.top+tr.height/2?'drag-over-top':'drag-over-bottom');
-    }
+    cards().forEach(c=>c.classList.remove('drag-over-top','drag-over-bottom'));
+    const gcy=origRect.top+(ty-startY)+origRect.height/2;
+    const t=cards().find(c=>{ if(parseInt(c.dataset.id)===dragId) return false; const r=c.getBoundingClientRect(); return gcy>=r.top&&gcy<=r.bottom; });
+    if(t){ const tr=t.getBoundingClientRect(); t.classList.add(gcy<tr.top+tr.height/2?'drag-over-top':'drag-over-bottom'); }
   },{passive:false});
-
   document.addEventListener('touchend',function(e){
     if(dragId===null||!ghost) return;
     const ty=e.changedTouches[0].clientY;
-    const ghostCY=origRect.top+(ty-startY)+origRect.height/2;
-    const target=getAllCards().find(c=>{
-      if(parseInt(c.dataset.id)===dragId) return false;
-      const r=c.getBoundingClientRect();
-      return ghostCY>=r.top&&ghostCY<=r.bottom;
-    });
-    if(target){
-      const targetId=parseInt(target.dataset.id);
-      const tr=target.getBoundingClientRect();
-      const insertAfter=ghostCY>=tr.top+tr.height/2;
+    const gcy=origRect.top+(ty-startY)+origRect.height/2;
+    const t=cards().find(c=>{ if(parseInt(c.dataset.id)===dragId) return false; const r=c.getBoundingClientRect(); return gcy>=r.top&&gcy<=r.bottom; });
+    if(t){
+      const tid=parseInt(t.dataset.id); const tr=t.getBoundingClientRect(); const after=gcy>=tr.top+tr.height/2;
       const di=items.findIndex(x=>x.id===dragId);
-      if(di!==-1){
-        const [moved]=items.splice(di,1);
-        const ni=items.findIndex(x=>x.id===targetId);
-        items.splice(insertAfter?ni+1:ni,0,moved);
-        items.forEach((x,i)=>x.order=i);
-        saveData();
-      }
+      if(di!==-1){ const [mv]=items.splice(di,1); const ni=items.findIndex(x=>x.id===tid); items.splice(after?ni+1:ni,0,mv); items.forEach((x,i)=>x.order=i); saveData(); }
     }
-    ghost.remove(); ghost=null;
-    getAllCards().forEach(c=>{ c.classList.remove('drag-over-top','drag-over-bottom'); c.style.opacity=''; });
-    dragId=null;
-    renderList();
+    ghost.remove(); ghost=null; cards().forEach(c=>{ c.classList.remove('drag-over-top','drag-over-bottom'); c.style.opacity=''; }); dragId=null; renderList();
   });
 }
 
@@ -597,11 +662,18 @@ function confirmDelete(id){
 }
 function closeConfirm(){ document.getElementById('confirmOverlay').style.display='none'; pendingDeleteId=null; }
 function executeDelete(){
-  if(pendingDeleteId){
-    items=items.filter(x=>x.id!==pendingDeleteId);
-    saveData(); closeConfirm(); renderList(); showToast('削除しました');
-  }
+  if(pendingDeleteId){ items=items.filter(x=>x.id!==pendingDeleteId); saveData(); closeConfirm(); renderList(); showToast('削除しました'); }
 }
+
+// ===== 汎用確認ダイアログ =====
+function openGenericConfirm(title, name, cb){
+  document.getElementById('genericConfirmTitle').textContent=title;
+  document.getElementById('genericConfirmName').textContent=name;
+  genericConfirmCallback=cb;
+  document.getElementById('genericConfirmOverlay').style.display='flex';
+}
+function closeGenericConfirm(){ document.getElementById('genericConfirmOverlay').style.display='none'; genericConfirmCallback=null; }
+function executeGenericConfirm(){ if(genericConfirmCallback){ genericConfirmCallback(); closeGenericConfirm(); } }
 
 // ===== 追加／編集モーダル =====
 function openModal(id){
@@ -610,246 +682,179 @@ function openModal(id){
   document.getElementById('modalTitleLabel').textContent=item?'アイテムを編集':'アイテムを追加';
   document.getElementById('ocrBtnArea').style.display='block';
   newCatSel=item?item.cat:activeCat;
+  newSubCatSel=item?.subCat||null;
   newTagSel=new Set(item?.tags||[]);
   document.getElementById('newTitle').value=item?.title||'';
   document.getElementById('newYomi').value=item?.yomi||'';
-  document.getElementById('newLink').value=item?.link||'';
+  renderLinkInputs(item?.links||(item?.link?[item.link]:['']));
   document.getElementById('priceInput').value=item?.price||'';
   document.getElementById('deadlineInput').value=item?.deadline||'';
   document.getElementById('screenshotInput').value='';
   document.getElementById('ocrStatus').textContent='';
-  if(item?.image){
-    document.getElementById('ocrPreviewImg').src=item.image;
-    document.getElementById('ocrPreview').style.display='block';
-  } else {
-    document.getElementById('ocrPreview').style.display='none';
-    document.getElementById('ocrPreviewImg').src='';
-  }
-  renderCatSelect(); updateDynamicFields(); renderTagSelect();
-  if(item){
-    if(item.status) document.getElementById('statusSelect').value=item.status;
-    if(item.type)   document.getElementById('typeSelect').value=item.type;
-  }
+  if(item?.image){ document.getElementById('ocrPreviewImg').src=item.image; document.getElementById('ocrPreview').style.display='block'; }
+  else { document.getElementById('ocrPreview').style.display='none'; document.getElementById('ocrPreviewImg').src=''; }
+  renderModalCatSelect(); renderModalSubCatSelect(); updateDynamicFields(); renderTagSelect();
+  if(item){ if(item.status) document.getElementById('statusSelect').value=item.status; if(item.type) document.getElementById('typeSelect').value=item.type; }
   document.getElementById('modalOverlay').style.display='flex';
 }
 function closeModal(){ document.getElementById('modalOverlay').style.display='none'; editingId=null; }
 function closeModalIfBg(e){ if(e.target.id==='modalOverlay') closeModal(); }
 
-function renderCatSelect(){
-  document.getElementById('catSelectRow').innerHTML=ALL_CATS.map(c=>
+function renderModalCatSelect(){
+  document.getElementById('catSelectRow').innerHTML=cats.map(c=>
     `<button class="cat-sel-btn${newCatSel===c.id?' selected':''}" onclick="selectNewCat('${c.id}')">${c.emoji} ${c.label}</button>`
   ).join('');
 }
-function selectNewCat(id){ newCatSel=id; newTagSel=new Set(); renderCatSelect(); updateDynamicFields(); renderTagSelect(); }
+function selectNewCat(id){ newCatSel=id; newSubCatSel=null; newTagSel=new Set(); renderModalCatSelect(); renderModalSubCatSelect(); updateDynamicFields(); renderTagSelect(); }
+
+function renderModalSubCatSelect(){
+  const subs=getSubCats(newCatSel);
+  const sec=document.getElementById('subCatSection');
+  if(!subs.length){ sec.style.display='none'; return; }
+  sec.style.display='block';
+  let html=`<button class="cat-sel-btn${newSubCatSel===null?' selected':''}" onclick="selectNewSubCat(null)">なし</button>`;
+  subs.forEach(s=>{
+    html+=`<button class="cat-sel-btn${newSubCatSel===s?' selected':''}" onclick="selectNewSubCat('${s.replace(/'/g,"\\'")}')">${s}</button>`;
+  });
+  document.getElementById('subCatSelectRow').innerHTML=html;
+}
+function selectNewSubCat(sub){ newSubCatSel=sub; newTagSel=new Set(); renderModalSubCatSelect(); renderTagSelect(); }
 
 function updateDynamicFields(){
   const opts=STATUS_OPTIONS[newCatSel]||[];
   const ss=document.getElementById('statusSection');
   const ts=document.getElementById('typeSection');
   const is=document.getElementById('interestSection');
-  if(newCatSel==='interest'){
-    ss.style.display='none'; is.style.display='block';
-  } else {
-    ss.style.display='block'; is.style.display='none';
-    document.getElementById('statusSelect').innerHTML=opts.map(o=>`<option value="${o.v}">${o.l}</option>`).join('');
-  }
+  if(newCatSel==='other'){ ss.style.display='none'; is.style.display='block'; }
+  else { ss.style.display=opts.length?'block':'none'; is.style.display='none'; if(opts.length) document.getElementById('statusSelect').innerHTML=opts.map(o=>`<option value="${o.v}">${o.l}</option>`).join(''); }
   ts.style.display=newCatSel==='music'?'block':'none';
 }
 
 function renderTagSelect(){
-  const tags=CAT_TAGS[newCatSel]||[];
-  document.getElementById('tagSelectRow').innerHTML=tags.map(t=>
-    `<button class="tag-chip${newTagSel.has(t)?' active':''}" onclick="toggleNewTag('${t}')">${t}</button>`
+  const tagList=getTags(newCatSel, newSubCatSel);
+  document.getElementById('tagSelectRow').innerHTML=tagList.map(t=>
+    `<button class="tag-chip${newTagSel.has(t)?' active':''}" onclick="toggleNewTag('${t.replace(/'/g,"\\'")}')">${t}</button>`
   ).join('')+`<button class="tag-chip add-tag" onclick="addTagInModal()">＋ 新規</button>`;
 }
 function toggleNewTag(t){ newTagSel.has(t)?newTagSel.delete(t):newTagSel.add(t); renderTagSelect(); }
 function addTagInModal(){
-  const t=prompt('新しいタグ名（例: 夜用）:');
+  const t=prompt('新しいタグ名（例: #ハードロック）:');
   if(t&&t.trim()){
-    const tag='#'+t.trim().replace(/^#/,'');
-    if(!CAT_TAGS[newCatSel]) CAT_TAGS[newCatSel]=[];
-    if(!CAT_TAGS[newCatSel].includes(tag)) CAT_TAGS[newCatSel].push(tag);
+    const tag=t.trim().startsWith('#')?t.trim():'#'+t.trim();
+    if(!newSubCatSel){ showToast('中項目を選択してからタグを追加してください'); return; }
+    if(!tags[newCatSel]) tags[newCatSel]={};
+    if(!tags[newCatSel][newSubCatSel]) tags[newCatSel][newSubCatSel]=[];
+    if(!tags[newCatSel][newSubCatSel].includes(tag)) tags[newCatSel][newSubCatSel].push(tag);
     saveData(); renderTagSelect(); renderTagRow();
   }
 }
 function addTagFromRow(){
-  const t=prompt('新しいタグ名（例: 夜用）:');
+  if(!activeSubCat){ showToast('中項目を選択してからタグを追加してください'); return; }
+  const t=prompt('新しいタグ名（例: #ハードロック）:');
   if(t&&t.trim()){
-    const tag='#'+t.trim().replace(/^#/,'');
-    if(!CAT_TAGS[activeCat]) CAT_TAGS[activeCat]=[];
-    if(!CAT_TAGS[activeCat].includes(tag)) CAT_TAGS[activeCat].push(tag);
+    const tag=t.trim().startsWith('#')?t.trim():'#'+t.trim();
+    if(!tags[activeCat]) tags[activeCat]={};
+    if(!tags[activeCat][activeSubCat]) tags[activeCat][activeSubCat]=[];
+    if(!tags[activeCat][activeSubCat].includes(tag)) tags[activeCat][activeSubCat].push(tag);
     saveData(); renderTagRow();
   }
 }
 
-// ===== 画像クリア =====
+// ===== 画像 =====
 function clearImage(){
   document.getElementById('ocrPreview').style.display='none';
   document.getElementById('ocrPreviewImg').src='';
   document.getElementById('ocrStatus').textContent='';
   document.getElementById('screenshotInput').value='';
 }
-
-// ===== URL→タイトル取得 =====
-async function fetchLinkTitle(){
-  const link=document.getElementById('newLink').value.trim();
-  if(!link){ showToast('URLを入力してください'); return; }
-  showToast('タイトルを取得中...');
-  try{
-    const res=await fetch('https://api.allorigins.win/get?url='+encodeURIComponent(link));
-    const data=await res.json();
-    const match=data.contents.match(/<title[^>]*>([^<]+)<\/title>/i);
-    if(match&&match[1]){
-      const t=match[1].trim()
-        .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')
-        .replace(/&#39;/g,"'").replace(/&quot;/g,'"');
-      document.getElementById('newTitle').value=t;
-      showToast('タイトルを取得しました！');
-    } else { showToast('タイトルを取得できませんでした'); }
-  } catch(e){ showToast('取得失敗。手動で入力してください'); }
+// 複数リンク管理
+let linkCount = 0;
+function renderLinkInputs(links){
+  const area=document.getElementById('linkInputsArea');
+  area.innerHTML='';
+  linkCount=0;
+  (links||['']).forEach(url=>addLinkInput(url));
+}
+function addLinkInput(url){
+  const area=document.getElementById('linkInputsArea');
+  const idx=linkCount++;
+  const row=document.createElement('div');
+  row.className='link-row';
+  row.id='link-row-'+idx;
+  row.innerHTML=`<input class="form-input" id="linkInput-${idx}" placeholder="https://..." value="${(url||'').replace(/"/g,'&quot;')}" style="margin-bottom:0;" /><button class="link-row-del" onclick="removeLinkRow(${idx})">✕</button>`;
+  area.appendChild(row);
+}
+function removeLinkRow(idx){
+  const row=document.getElementById('link-row-'+idx);
+  if(row) row.remove();
+  const area=document.getElementById('linkInputsArea');
+  if(!area.children.length) addLinkInput('');
+}
+function getLinks(){
+  const area=document.getElementById('linkInputsArea');
+  const links=[];
+  area.querySelectorAll('input[id^="linkInput-"]').forEach(el=>{
+    const v=el.value.trim();
+    if(v) links.push(v);
+  });
+  return links;
 }
 
-// ===== 簡易フリガナ推測（ひらがな→カタカナ） =====
-function guessYomi(text){
-  return text.replace(/[\u3041-\u3096]/g, ch=>String.fromCharCode(ch.charCodeAt(0)+0x60));
-}
 
-// ===== 画像選択＆トリミング処理 =====
 function handleImageSelect(event){
-  const file=event.target.files[0];
-  if(!file) return;
+  const file=event.target.files[0]; if(!file) return;
   event.target.value='';
   const reader=new FileReader();
-  reader.onload=function(e){
-    openCropModal(e.target.result);
-  };
+  reader.onload=function(e){ openCropModal(e.target.result); };
   reader.readAsDataURL(file);
 }
-
-// ===== トリミングモーダル =====
 function openCropModal(dataUrl){
-  const overlay=document.getElementById('cropOverlay');
   const img=document.getElementById('cropImage');
-  // 既存のCropperを破棄
   if(cropperInstance){ cropperInstance.destroy(); cropperInstance=null; }
   img.src=dataUrl;
-  overlay.style.display='flex';
-  // 画像ロード後にCropper初期化
-  img.onload=function(){
-    cropperInstance=new Cropper(img,{
-      aspectRatio: 1,
-      viewMode: 1,
-      dragMode: 'move',
-      autoCropArea: 0.8,
-      restore: false,
-      guides: true,
-      center: true,
-      highlight: false,
-      cropBoxMovable: true,
-      cropBoxResizable: true,
-      toggleDragModeOnDblclick: false,
-    });
-  };
+  document.getElementById('cropOverlay').style.display='flex';
+  // 読書カテゴリは書籍サイズ比（縦長 2:3）、それ以外は正方形
+  const ratio = newCatSel==='book' ? 2/3 : 1;
+  img.onload=function(){ cropperInstance=new Cropper(img,{aspectRatio:ratio,viewMode:1,dragMode:'move',autoCropArea:0.8,restore:false,guides:true,center:true,highlight:false,toggleDragModeOnDblclick:false}); };
 }
-function cancelCrop(){
-  if(cropperInstance){ cropperInstance.destroy(); cropperInstance=null; }
-  document.getElementById('cropOverlay').style.display='none';
-}
+function cancelCrop(){ if(cropperInstance){ cropperInstance.destroy(); cropperInstance=null; } document.getElementById('cropOverlay').style.display='none'; }
 function confirmCrop(){
   if(!cropperInstance) return;
-  // トリミングした画像をcanvasから取得（400x400px）
   const canvas=cropperInstance.getCroppedCanvas({width:400,height:400});
-  const croppedDataUrl=canvas.toDataURL('image/jpeg',0.85);
-
-  // プレビューに反映
-  const img=document.getElementById('ocrPreviewImg');
-  img.src=croppedDataUrl;
+  const url=canvas.toDataURL('image/jpeg',0.85);
+  document.getElementById('ocrPreviewImg').src=url;
   document.getElementById('ocrPreview').style.display='block';
-
-  // OCRを実行（Tesseract.js）
-  const status=document.getElementById('ocrStatus');
-  status.textContent='🔍 テキストを読み取り中...';
-  runOCR(croppedDataUrl, status);
-
+  document.getElementById('ocrStatus').textContent='';
   cropperInstance.destroy(); cropperInstance=null;
   document.getElementById('cropOverlay').style.display='none';
 }
-
-// ===== OCR（Tesseract.js 動的読み込み） =====
-function runOCR(dataUrl, statusEl){
-  function doRecognize(){
-    Tesseract.recognize(dataUrl,'eng+jpn',{
-      logger: m=>{
-        if(m.status==='recognizing text'){
-          statusEl.textContent='🔍 読み取り中... '+Math.round(m.progress*100)+'%';
-        }
-      }
-    }).then(({data:{text}})=>{
-      const lines=text.split('\n').map(l=>l.trim()).filter(l=>l.length>1);
-      if(lines.length>0){
-        const extracted=lines[0];
-        document.getElementById('newTitle').value=extracted;
-        const yomi=guessYomi(extracted);
-        if(yomi!==extracted) document.getElementById('newYomi').value=yomi;
-        statusEl.textContent='✅ 抽出完了！タイトルを確認・編集してください';
-        showToast('テキスト抽出完了！');
-      } else {
-        statusEl.textContent='⚠️ テキストが読み取れませんでした';
-      }
-    }).catch(()=>{
-      statusEl.textContent='⚠️ 読み取りに失敗しました。手動で入力してください';
-    });
-  }
-
-  if(typeof Tesseract!=='undefined'){
-    doRecognize();
-  } else {
-    // 動的読み込み
-    const s=document.createElement('script');
-    s.src='https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js';
-    s.onload=doRecognize;
-    s.onerror=()=>{ statusEl.textContent='⚠️ OCR機能はオフラインでは使えません'; };
-    document.head.appendChild(s);
-  }
-}
+// OCR機能は廃止（精度問題のため）
 
 // ===== アイテム保存 =====
 function saveItem(){
   const title=document.getElementById('newTitle').value.trim();
   if(!title){ showToast('タイトルを入力してください'); return; }
   const yomi=document.getElementById('newYomi').value.trim();
-  const link=document.getElementById('newLink').value.trim();
+  // links are handled via getLinks()
   const imgSrc=document.getElementById('ocrPreviewImg').src;
   const image=imgSrc&&imgSrc.startsWith('data:')?imgSrc:'';
-
   if(editingId){
     const item=items.find(x=>x.id===editingId);
     if(item){
-      item.title=title; item.yomi=yomi||undefined; item.cat=newCatSel; item.tags=[...newTagSel];
-      item.link=link||undefined;
-      item.image=image||item.image||undefined;
-      if(newCatSel!=='interest') item.status=document.getElementById('statusSelect').value;
-      if(newCatSel==='music')    item.type=document.getElementById('typeSelect').value;
-      if(newCatSel==='interest'){
-        const p=document.getElementById('priceInput').value;
-        const d=document.getElementById('deadlineInput').value;
-        item.price=p?parseInt(p):undefined;
-        item.deadline=d||undefined;
-      } else { delete item.price; delete item.deadline; }
+      item.title=title; item.yomi=yomi||undefined; item.cat=newCatSel; item.subCat=newSubCatSel||undefined;
+      item.tags=[...newTagSel]; const lks=getLinks(); item.links=lks.length?lks:undefined; item.link=lks[0]||undefined; item.image=image||item.image||undefined;
+      if(STATUS_OPTIONS[newCatSel]?.length) item.status=document.getElementById('statusSelect').value;
+      if(newCatSel==='music') item.type=document.getElementById('typeSelect').value;
+      if(newCatSel==='other'){ const p=document.getElementById('priceInput').value; const d=document.getElementById('deadlineInput').value; item.price=p?parseInt(p):undefined; item.deadline=d||undefined; }
+      else { delete item.price; delete item.deadline; }
     }
     showToast('更新しました！');
   } else {
-    const ni={id:Date.now(),title,yomi:yomi||undefined,cat:newCatSel,tags:[...newTagSel],order:items.length};
-    if(link)  ni.link=link;
-    if(image) ni.image=image;
-    if(newCatSel!=='interest') ni.status=document.getElementById('statusSelect').value;
-    if(newCatSel==='music')    ni.type=document.getElementById('typeSelect').value;
-    if(newCatSel==='interest'){
-      const p=document.getElementById('priceInput').value;
-      const d=document.getElementById('deadlineInput').value;
-      if(p) ni.price=parseInt(p);
-      if(d) ni.deadline=d;
-    }
+    const ni={id:Date.now(),title,yomi:yomi||undefined,cat:newCatSel,subCat:newSubCatSel||undefined,tags:[...newTagSel],order:items.length};
+    const lks2=getLinks(); if(lks2.length){ni.links=lks2; ni.link=lks2[0];} if(image) ni.image=image;
+    if(STATUS_OPTIONS[newCatSel]?.length) ni.status=document.getElementById('statusSelect').value;
+    if(newCatSel==='music') ni.type=document.getElementById('typeSelect').value;
+    if(newCatSel==='other'){ const p=document.getElementById('priceInput').value; const d=document.getElementById('deadlineInput').value; if(p) ni.price=parseInt(p); if(d) ni.deadline=d; }
     items.push(ni);
     showToast('追加しました！');
   }
@@ -858,87 +863,158 @@ function saveItem(){
 
 // ===== 設定画面 =====
 function openSettings(){
-  renderCatToggleList(); renderTagManageList();
+  renderCatManageList(); renderSubTagManageList();
   document.getElementById('settingsOverlay').style.display='flex';
 }
 function closeSettings(){
   document.getElementById('settingsOverlay').style.display='none';
-  renderCatTabs(); renderTagRow(); renderList();
+  renderCatTabs(); renderSubTabs(); renderTagRow(); renderList();
 }
-function renderCatToggleList(){
-  document.getElementById('catToggleList').innerHTML=ALL_CATS.map(c=>`
-    <div class="settings-row">
-      <span class="settings-row-name">${c.emoji} ${c.label}</span>
+
+// 大項目管理（並び替え・表示切替）
+function renderCatManageList(){
+  document.getElementById('catManageList').innerHTML=cats.map((c,idx)=>`
+    <div class="cat-manage-row">
+      <span class="cat-manage-name">${c.emoji} ${c.label}</span>
+      <div class="cat-move-btns">
+        <button class="cat-move-btn" onclick="moveCat(${idx},-1)" ${idx===0?'disabled':''}>▲</button>
+        <button class="cat-move-btn" onclick="moveCat(${idx},+1)" ${idx===cats.length-1?'disabled':''}>▼</button>
+      </div>
       <button class="toggle${hiddenCats.has(c.id)?'':' on'}" onclick="toggleCatVisibility('${c.id}')"></button>
     </div>
   `).join('');
 }
+function moveCat(idx,dir){
+  const ni=idx+dir; if(ni<0||ni>=cats.length) return;
+  const tmp=cats[idx]; cats[idx]=cats[ni]; cats[ni]=tmp;
+  saveData(); renderCatManageList();
+}
 function toggleCatVisibility(id){
   if(!hiddenCats.has(id)&&visibleCats().length<=1){ showToast('最低1つは表示が必要です'); return; }
   hiddenCats.has(id)?hiddenCats.delete(id):hiddenCats.add(id);
-  saveData(); renderCatToggleList();
+  saveData(); renderCatManageList();
 }
 
-// ===== タグ管理（▲▼ボタン） =====
-function renderTagManageList(){
+// 中項目・タグ管理
+function renderSubTagManageList(){
   let html='';
-  ALL_CATS.forEach(c=>{
-    const tags=CAT_TAGS[c.id]||[];
-    html+=`<div class="tag-section-label">${c.emoji} ${c.label}</div>`;
-    if(!tags.length){
-      html+=`<div style="font-size:13px;color:var(--text3);padding:6px 4px 4px;">タグなし</div>`;
-    } else {
-      tags.forEach((t,idx)=>{
-        const safeT=t.replace(/'/g,"\\'");
-        const isFirst=idx===0, isLast=idx===tags.length-1;
-        html+=`<div class="tag-manage-row">
+  cats.forEach(c=>{
+    html+=`<div class="sub-section-label">${c.emoji} ${c.label}</div>`;
+    const subs=getSubCats(c.id);
+    // 中項目リスト
+    subs.forEach((s,sidx)=>{
+      const ss=s.replace(/'/g,"\\'");
+      html+=`<div class="sub-manage-row">
+        <span class="sub-manage-name">▸ ${s}</span>
+        <div class="sub-move-btns">
+          <button class="sub-move-btn" onclick="moveSubCat('${c.id}',${sidx},-1)" ${sidx===0?'disabled':''}>▲</button>
+          <button class="sub-move-btn" onclick="moveSubCat('${c.id}',${sidx},+1)" ${sidx===subs.length-1?'disabled':''}>▼</button>
+        </div>
+        <button class="sub-del-btn" onclick="confirmDelSubCat('${c.id}','${ss}')">${SVG_TRASH}</button>
+      </div>`;
+      // タグリスト（この中項目に属するタグ）
+      const tagList=(tags[c.id]&&tags[c.id][s])||[];
+      tagList.forEach((t,tidx)=>{
+        const st=t.replace(/'/g,"\\'");
+        html+=`<div class="tag-manage-row" style="margin-left:16px;">
           <span class="tag-manage-name">${t}</span>
           <div class="tag-move-btns">
-            <button class="tag-move-btn" onclick="moveTag('${c.id}',${idx},-1)" ${isFirst?'disabled':''}>▲</button>
-            <button class="tag-move-btn" onclick="moveTag('${c.id}',${idx},+1)" ${isLast?'disabled':''}>▼</button>
+            <button class="tag-move-btn" onclick="moveTag('${c.id}','${ss}',${tidx},-1)" ${tidx===0?'disabled':''}>▲</button>
+            <button class="tag-move-btn" onclick="moveTag('${c.id}','${ss}',${tidx},+1)" ${tidx===tagList.length-1?'disabled':''}>▼</button>
           </div>
-          <button class="tag-del-btn" onclick="confirmTagDelete('${c.id}','${safeT}')">${SVG_TRASH}</button>
+          <button class="tag-del-btn" onclick="confirmDelTag('${c.id}','${ss}','${st}')">${SVG_TRASH}</button>
         </div>`;
       });
-    }
-    html+=`<div class="add-tag-row">
-      <input class="add-tag-input" id="newTagInput-${c.id}" placeholder="新しいタグ名" />
-      <button class="add-tag-btn" onclick="addTagFromSettings('${c.id}')">追加</button>
+      // タグ追加
+      html+=`<div class="add-row" style="margin-left:16px;">
+        <input class="add-input" id="newTagInput-${c.id}-${sidx}" placeholder="新しいタグ名" />
+        <button class="add-btn" onclick="addTagFromSettings('${c.id}','${ss}',${sidx})">追加</button>
+      </div>`;
+    });
+    // 中項目追加
+    html+=`<div class="add-row">
+      <input class="add-input" id="newSubInput-${c.id}" placeholder="新しい中項目名" />
+      <button class="add-btn" onclick="addSubCatFromSettings('${c.id}')">追加</button>
     </div>`;
   });
-  document.getElementById('tagManageList').innerHTML=html;
+  document.getElementById('subTagManageList').innerHTML=html;
 }
 
-function moveTag(catId, idx, dir){
-  const arr=CAT_TAGS[catId];
-  if(!arr) return;
-  const newIdx=idx+dir;
-  if(newIdx<0||newIdx>=arr.length) return;
-  const tmp=arr[idx]; arr[idx]=arr[newIdx]; arr[newIdx]=tmp;
-  saveData(); renderTagManageList(); renderTagRow();
-}
-
-function confirmTagDelete(catId,tag){
-  pendingDeleteTag=tag; pendingDeleteTagCat=catId;
-  document.getElementById('tagConfirmName').textContent=tag;
-  document.getElementById('tagConfirmOverlay').style.display='flex';
-}
-function closeTagConfirm(){ document.getElementById('tagConfirmOverlay').style.display='none'; pendingDeleteTag=null; pendingDeleteTagCat=null; }
-function executeTagDelete(){
-  if(pendingDeleteTag&&pendingDeleteTagCat){
-    CAT_TAGS[pendingDeleteTagCat]=CAT_TAGS[pendingDeleteTagCat].filter(t=>t!==pendingDeleteTag);
-    saveData(); closeTagConfirm(); renderTagManageList(); showToast('タグを削除しました');
+function moveSubCat(catId,idx,dir){
+  const arr=subCats[catId]; if(!arr) return;
+  const ni=idx+dir; if(ni<0||ni>=arr.length) return;
+  const tmp=arr[idx]; arr[idx]=arr[ni]; arr[ni]=tmp;
+  // tagsのキーも追従
+  if(tags[catId]){
+    const kt=tags[catId][arr[ni]]; // 交換後のni位置（元idx）
+    const ki=tags[catId][arr[idx]];
+    tags[catId][arr[ni]]=kt; tags[catId][arr[idx]]=ki;
   }
+  saveData(); renderSubTagManageList();
 }
-function addTagFromSettings(catId){
-  const input=document.getElementById('newTagInput-'+catId);
-  const t=input.value.trim();
-  if(!t){ showToast('タグ名を入力してください'); return; }
-  const tag='#'+t.replace(/^#/,'');
-  if(!CAT_TAGS[catId]) CAT_TAGS[catId]=[];
-  if(CAT_TAGS[catId].includes(tag)){ showToast('同じタグが既にあります'); return; }
-  CAT_TAGS[catId].push(tag);
-  input.value=''; saveData(); renderTagManageList(); showToast('タグを追加しました');
+function confirmDelSubCat(catId,sub){
+  openGenericConfirm('この中項目を削除しますか？',sub,()=>{
+    subCats[catId]=(subCats[catId]||[]).filter(s=>s!==sub);
+    if(tags[catId]) delete tags[catId][sub];
+    saveData(); renderSubTagManageList(); showToast('中項目を削除しました');
+  });
+}
+function addSubCatFromSettings(catId){
+  const input=document.getElementById('newSubInput-'+catId);
+  const s=input.value.trim(); if(!s){ showToast('中項目名を入力してください'); return; }
+  if(!subCats[catId]) subCats[catId]=[];
+  if(subCats[catId].includes(s)){ showToast('同じ中項目が既にあります'); return; }
+  subCats[catId].push(s);
+  input.value=''; saveData(); renderSubTagManageList(); showToast('中項目を追加しました');
+}
+function moveTag(catId,sub,idx,dir){
+  if(!tags[catId]||!tags[catId][sub]) return;
+  const arr=tags[catId][sub]; const ni=idx+dir;
+  if(ni<0||ni>=arr.length) return;
+  const tmp=arr[idx]; arr[idx]=arr[ni]; arr[ni]=tmp;
+  saveData(); renderSubTagManageList(); renderTagRow();
+}
+function confirmDelTag(catId,sub,tag){
+  openGenericConfirm('このタグを削除しますか？',tag,()=>{
+    if(tags[catId]&&tags[catId][sub]) tags[catId][sub]=tags[catId][sub].filter(t=>t!==tag);
+    saveData(); renderSubTagManageList(); showToast('タグを削除しました');
+  });
+}
+function addTagFromSettings(catId,sub,sidx){
+  const input=document.getElementById(`newTagInput-${catId}-${sidx}`);
+  const t=input.value.trim(); if(!t){ showToast('タグ名を入力してください'); return; }
+  const tag=t.startsWith('#')?t:'#'+t;
+  if(!tags[catId]) tags[catId]={};
+  if(!tags[catId][sub]) tags[catId][sub]=[];
+  if(tags[catId][sub].includes(tag)){ showToast('同じタグが既にあります'); return; }
+  tags[catId][sub].push(tag);
+  input.value=''; saveData(); renderSubTagManageList(); showToast('タグを追加しました');
+}
+
+// ===== アプリ更新・リセット =====
+async function updateAppVersion(){
+  showToast('🔄 最新バージョンに更新中...');
+  try{
+    if('caches' in window){ const keys=await caches.keys(); await Promise.all(keys.map(k=>caches.delete(k))); }
+    if('serviceWorker' in navigator){ const regs=await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map(r=>r.update())); }
+    setTimeout(()=>{ window.location.reload(true); },1000);
+  }catch(e){ setTimeout(()=>{ window.location.reload(true); },800); }
+}
+function confirmResetData(){
+  if(!confirm('登録したデータをすべて削除してリセットしますか？\n（この操作は元に戻せません）')) return;
+  items=[]; cats=DEFAULT_CATS.map(c=>({...c}));
+  subCats=JSON.parse(JSON.stringify(DEFAULT_SUB_CATS));
+  tags=JSON.parse(JSON.stringify(DEFAULT_TAGS));
+  hiddenCats=new Set();
+  try{
+    localStorage.setItem('ms_items',   JSON.stringify([]));
+    localStorage.setItem('ms_cats',    JSON.stringify(cats));
+    localStorage.setItem('ms_subcats', JSON.stringify(subCats));
+    localStorage.setItem('ms_tags',    JSON.stringify(tags));
+    localStorage.setItem('ms_hidden',  JSON.stringify([]));
+  }catch(e){}
+  closeSettings(); renderCatTabs(); renderSubTabs(); renderTagRow(); renderList();
+  showToast('✅ データをリセットしました');
 }
 
 // ===== Toast =====
@@ -946,52 +1022,6 @@ function showToast(msg){
   const el=document.getElementById('toast');
   el.textContent=msg; el.classList.add('show');
   setTimeout(()=>el.classList.remove('show'),2200);
-}
-
-// ===== サンプルデータ削除・リセット =====
-function confirmResetData(){
-  if(!confirm('登録したデータをすべて削除してリセットしますか？\n（この操作は元に戻せません）')) return;
-  localStorage.removeItem('clip_items');
-  localStorage.removeItem('clip_tags');
-  localStorage.removeItem('clip_hidden');
-  // 状態変数もリセット
-  items=[];
-  CAT_TAGS={
-    music:['#朝用','#ディナー','#テンションアップ','#邦楽','#海外'],
-    movie:['#土日用','#ディナー','#海外'],
-    book:['#土日用','#集中'],
-    interest:['#ガジェット','#ファッション','#食品'],
-    other:['#メモ','#その他'],
-  };
-  hiddenCats=new Set();
-  saveData();
-  closeSettings();
-  renderCatTabs(); renderTagRow(); renderList();
-  showToast('✅ データをリセットしました');
-}
-
-// ===== アプリ更新（データ保持・キャッシュクリア） =====
-async function updateAppVersion(){
-  showToast('🔄 最新バージョンに更新中...');
-  try{
-    // Service Workerのキャッシュを全削除
-    if('caches' in window){
-      const keys = await caches.keys();
-      await Promise.all(keys.map(k=>caches.delete(k)));
-    }
-    // Service Workerの登録を更新
-    if('serviceWorker' in navigator){
-      const regs = await navigator.serviceWorker.getRegistrations();
-      await Promise.all(regs.map(r=>r.update()));
-    }
-    // 1秒後にハードリロード（データは localStorage に残る）
-    setTimeout(()=>{
-      window.location.reload(true);
-    }, 1000);
-  } catch(e){
-    // フォールバック：強制リロード
-    setTimeout(()=>{ window.location.reload(true); }, 800);
-  }
 }
 
 // ===== Service Worker =====
@@ -1002,6 +1032,7 @@ if('serviceWorker' in navigator){
 // ===== 起動 =====
 loadData();
 renderCatTabs();
+renderSubTabs();
 renderTagRow();
 renderList();
 </script>
