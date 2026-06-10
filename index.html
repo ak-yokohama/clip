@@ -12,8 +12,9 @@
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <title>The MasterShelf</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Space+Mono:wght@700&family=Orbitron:wght@700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
@@ -28,6 +29,23 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
 .header{display:flex;align-items:center;justify-content:flex-start;padding:52px 20px 10px;background:var(--bg);flex-shrink:0;position:relative;}
 .header-logo{height:52px;width:auto;display:block;}
 .header-icons{position:absolute;top:8px;right:8px;display:flex;gap:4px;align-items:center;}
+.share-btn{background:transparent;border:none;color:var(--accent2);cursor:pointer;padding:8px;display:flex;align-items:center;justify-content:center;min-width:36px;min-height:36px;}
+.share-btn svg{width:22px;height:22px;}
+/* シェアモーダル */
+.share-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:250;display:flex;align-items:flex-end;justify-content:center;}
+.share-modal{background:var(--bg2);border-radius:20px 20px 0 0;padding:20px 20px 36px;width:100%;max-width:480px;}
+.share-preview{width:100%;border-radius:var(--radiusSm);overflow:hidden;margin-bottom:14px;background:var(--bg);border:1px solid var(--border);}
+.share-preview-inner{padding:12px;}
+.share-preview-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.share-preview-list{display:flex;flex-direction:column;gap:4px;}
+.share-preview-item{font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;}
+.share-text-area{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radiusSm);color:var(--text);padding:12px;font-size:13px;margin-bottom:14px;resize:none;font-family:'Noto Sans JP',sans-serif;line-height:1.6;}
+.share-actions{display:flex;gap:8px;}
+.share-do-btn{flex:2;padding:14px;background:var(--accent);border:none;border-radius:var(--radiusSm);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;}
+.share-copy-btn{flex:1;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radiusSm);color:var(--text2);font-size:14px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;}
+.share-close-btn{width:100%;padding:12px;background:transparent;border:1px solid var(--border);border-radius:var(--radiusSm);color:var(--text3);font-size:14px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;margin-top:8px;}
+.share-img-preview{width:100%;border-radius:var(--radiusSm);margin-bottom:10px;display:none;}
+.share-status{font-size:12px;color:var(--text3);text-align:center;padding:4px 0;}
 .icon-btn{background:transparent;border:none;color:var(--text2);cursor:pointer;padding:8px;display:flex;align-items:center;justify-content:center;min-width:36px;min-height:36px;}
 .icon-btn svg{width:22px;height:22px;}
 /* 大項目タブ */
@@ -68,17 +86,15 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
 .item-yomi{font-size:11px;color:var(--text3);margin-top:2px;}
 .item-sub{font-size:11px;color:var(--accent2);margin-top:2px;}
 .item-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;}
-.status-badge{padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500;}
-.badge-free{background:rgba(63,186,122,.15);color:#3FBA7A;}
-.badge-paid{background:rgba(240,160,32,.15);color:#F0A020;}
-.badge-unknown{background:rgba(90,88,112,.2);color:var(--text3);}
+.sub-badge{padding:2px 9px;border-radius:4px;font-size:11px;font-weight:500;background:rgba(124,110,250,.15);color:var(--accent2);letter-spacing:.03em;}
 .item-price{font-size:11px;color:var(--amber);font-family:'Space Mono',monospace;}
 .item-deadline{font-size:11px;display:flex;align-items:center;gap:3px;}
 .item-tags{display:flex;gap:4px;flex-wrap:wrap;}
 .item-tag{font-size:11px;color:var(--text3);background:var(--bg3);padding:2px 7px;border-radius:4px;}
 .item-actions{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 10px;gap:8px;flex-shrink:0;}
-.alexa-launch-btn{display:flex;align-items:center;gap:4px;padding:7px 10px;background:linear-gradient(135deg,#1565C0,#1A7AEE);border-radius:var(--radiusSm);border:none;color:#fff;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'Space Mono',monospace;}
-.alexa-launch-btn svg{width:12px;height:12px;}
+.alexa-launch-btn{display:flex;align-items:center;gap:5px;padding:7px 11px;background:linear-gradient(135deg,#0D47A1,#1976D2);border-radius:6px;border:none;color:#fff;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'Orbitron',sans-serif;letter-spacing:.05em;box-shadow:0 2px 8px rgba(25,118,210,.4);}
+.alexa-launch-btn:active{opacity:.85;transform:scale(.96);}
+.alexa-launch-btn svg{width:11px;height:11px;flex-shrink:0;}
 .edit-btn{background:transparent;border:1px solid var(--border);color:var(--text3);border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
 .edit-btn svg{width:15px;height:15px;}
 .delete-btn{background:transparent;border:1px solid var(--border);color:var(--text3);border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
@@ -170,7 +186,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
 .empty-state{text-align:center;padding:60px 20px;color:var(--text3);font-size:14px;}
 .empty-state svg{width:44px;height:44px;margin:0 auto 12px;display:block;opacity:.4;}
 /* 画像・リンク */
+.rank-badge{position:absolute;top:6px;left:6px;font-size:18px;line-height:1;z-index:2;filter:drop-shadow(0 1px 3px rgba(0,0,0,.5));pointer-events:none;}
+.item-card{position:relative;}
 .item-thumb{width:52px;min-width:52px;height:52px;border-radius:6px;object-fit:cover;margin-right:6px;background:var(--bg3);}
+.item-thumb.book{width:40px;min-width:40px;height:60px;border-radius:4px;box-shadow:2px 2px 6px rgba(0,0,0,.4);}
 .item-link{font-size:11px;color:var(--accent2);text-decoration:none;display:flex;align-items:center;gap:3px;margin-top:3px;word-break:break-all;}
 .item-link svg{width:11px;height:11px;flex-shrink:0;}
 .link-input-row{display:flex;gap:6px;margin-bottom:14px;}
@@ -180,6 +199,16 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
 .image-preview-wrap img{width:100%;max-height:140px;object-fit:cover;border-radius:var(--radiusSm);}
 .image-preview-del{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.6);border:none;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;}
 .ocr-status{font-size:12px;color:var(--accent2);padding:4px 2px;margin-bottom:10px;}
+.rank-btn{padding:8px 14px;border-radius:20px;border:2px solid var(--border);background:transparent;color:var(--text2);font-size:16px;cursor:pointer;transition:all .15s;}
+.rank-btn.selected-gold{background:rgba(255,215,0,.15);border-color:#FFD700;box-shadow:0 0 8px rgba(255,215,0,.3);}
+.rank-btn.selected-silver{background:rgba(192,192,192,.15);border-color:#C0C0C0;box-shadow:0 0 8px rgba(192,192,192,.3);}
+.rank-btn.selected-bronze{background:rgba(205,127,50,.15);border-color:#CD7F32;box-shadow:0 0 8px rgba(205,127,50,.3);}
+.expand-btn{background:transparent;border:none;color:var(--text3);font-size:11px;cursor:pointer;padding:4px 0 2px;display:flex;align-items:center;gap:3px;font-family:'Noto Sans JP',sans-serif;}
+.expand-btn svg{width:12px;height:12px;transition:transform .2s;}
+.expand-btn.open svg{transform:rotate(180deg);}
+.expandable{display:none;margin-top:6px;}
+.expandable.open{display:block;}
+.item-memo{font-size:11px;color:var(--text3);margin-top:4px;line-height:1.5;word-break:break-all;white-space:pre-wrap;}
 .add-link-btn{width:100%;padding:10px;border:1.5px dashed var(--border);border-radius:var(--radiusSm);background:transparent;color:var(--accent2);font-size:13px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;margin-bottom:14px;display:block;}
 .link-row{display:flex;gap:6px;margin-bottom:8px;align-items:center;}
 .link-row input{flex:1;margin-bottom:0;}
@@ -201,6 +230,12 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
   <div class="header">
     <img src="logo.png" alt="The MasterShelf" class="header-logo" />
     <div class="header-icons">
+      <button class="share-btn" onclick="openShareModal()" aria-label="シェア">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        </svg>
+      </button>
       <button class="icon-btn" onclick="openSettings()" aria-label="設定">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="3"/>
@@ -218,7 +253,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
   <div class="sort-bar">
     <span class="sort-label">並び順:</span>
     <button class="sort-btn active" data-sort="custom" onclick="setSort('custom')">登録順</button>
-    <button class="sort-btn" data-sort="deadline" onclick="setSort('deadline')">期限順</button>
+    <button class="sort-btn" data-sort="rank" onclick="setSort('rank')">ランク順</button>
     <button class="sort-btn" data-sort="alpha" onclick="setSort('alpha')">AZ順</button>
   </div>
   <div class="list-area" id="listArea"></div>
@@ -254,6 +289,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
       <div id="linkInputsArea"></div>
       <button class="add-link-btn" onclick="addLinkInput()">＋ リンクを追加</button>
     </div>
+    <label class="form-label">ランク（任意）</label>
+    <div class="cat-select-row" id="rankSelectRow"></div>
     <label class="form-label">タイトル</label>
     <input class="form-input" id="newTitle" placeholder="タイトルを入力" />
     <label class="form-label">読み仮名（任意）</label>
@@ -264,10 +301,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
       <label class="form-label">中項目（任意）</label>
       <div class="cat-select-row" id="subCatSelectRow"></div>
     </div>
-    <div id="statusSection">
-      <label class="form-label">状態</label>
-      <select class="form-select" id="statusSelect"></select>
-    </div>
     <div id="typeSection" style="display:none;">
       <label class="form-label">種別</label>
       <select class="form-select" id="typeSelect">
@@ -275,20 +308,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
         <option value="song">曲</option>
       </select>
     </div>
-    <div id="interestSection" style="display:none;">
-      <div class="form-row">
-        <div>
-          <label class="form-label">価格（任意）</label>
-          <input class="form-input" id="priceInput" placeholder="¥0" type="number" />
-        </div>
-        <div>
-          <label class="form-label">購入期限（任意）</label>
-          <input class="form-input" id="deadlineInput" type="date" />
-        </div>
-      </div>
-    </div>
     <label class="form-label">タグ（任意）</label>
     <div class="cat-select-row" id="tagSelectRow"></div>
+    <label class="form-label">メモ（任意）</label>
+    <textarea class="form-input" id="newMemo" placeholder="メモを入力..." rows="3" style="resize:none;line-height:1.6;"></textarea>
     <button class="submit-btn" onclick="saveItem()">保存する</button>
   </div>
 </div>
@@ -345,6 +368,28 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
         <button class="reset-btn" onclick="confirmResetData()">⚠️ データをすべてリセット</button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- シェアモーダル -->
+<div class="share-overlay" id="shareOverlay" style="display:none;" onclick="closeShareIfBg(event)">
+  <div class="share-modal" id="shareModal">
+    <div class="modal-header">
+      <span class="modal-title">📤 棚をシェア</span>
+      <button class="close-btn" onclick="closeShareModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <img id="shareImgPreview" class="share-img-preview" alt="preview" />
+    <div class="share-status" id="shareStatus">📷 棚の画像を生成中...</div>
+    <textarea class="share-text-area" id="shareTextArea" rows="5"></textarea>
+    <div class="share-actions">
+      <button class="share-copy-btn" onclick="copyShareText()">📋 コピー</button>
+      <button class="share-do-btn" onclick="doShare()">📤 シェア</button>
+    </div>
+    <button class="share-close-btn" onclick="closeShareModal()">キャンセル</button>
   </div>
 </div>
 
@@ -455,6 +500,7 @@ let sortMode     = 'custom';
 let editingId    = null;
 let newCatSel    = 'music';
 let newSubCatSel = null;
+let newRankSel   = null;
 let newTagSel    = new Set();
 let pendingDeleteId = null;
 let genericConfirmCallback = null;
@@ -469,13 +515,7 @@ function getTags(catId, subCat){
   return (tags[catId]&&tags[catId][subCat])||[];
 }
 
-function statusBadge(s){
-  if(!s||s==='unknown') return '<span class="status-badge badge-unknown">不明</span>';
-  if(s==='free')        return '<span class="status-badge badge-free">無料</span>';
-  if(s==='paid')        return '<span class="status-badge badge-paid">有料</span>';
-  if(s==='general')     return '<span class="status-badge badge-free">一般</span>';
-  return '';
-}
+// statusBadge廃止（中項目バッジに移行）
 function deadlineBadge(d){
   if(!d) return '';
   const days=Math.round((new Date(d)-new Date())/(1000*86400));
@@ -541,10 +581,10 @@ function getFiltered(){
   if(activeSubCat) res=res.filter(i=>i.subCat===activeSubCat);
   if(activeTags.size>0) res=res.filter(i=>(i.tags||[]).some(t=>activeTags.has(t)));
   if(sortMode==='alpha') res.sort((a,b)=>a.title.localeCompare(b.title,'ja'));
-  else if(sortMode==='deadline') res.sort((a,b)=>{
-    if(!a.deadline&&!b.deadline) return 0;
-    if(!a.deadline) return 1; if(!b.deadline) return -1;
-    return new Date(a.deadline)-new Date(b.deadline);
+  else if(sortMode==='rank') res.sort((a,b)=>{
+    const order={'gold':0,'silver':1,'bronze':2};
+    const ra=order[a.rank]??3, rb=order[b.rank]??3;
+    return ra-rb;
   });
   else res.sort((a,b)=>a.order-b.order);
   return res;
@@ -560,14 +600,14 @@ function renderList(){
   const c=catById(activeCat);
   el.innerHTML=list.map(item=>{
     const tags2=(item.tags||[]).map(t=>`<span class="item-tag">${t}</span>`).join('');
-    const priceStr=item.price?`<span class="item-price">¥${item.price.toLocaleString()}</span>`:'';
-    const thumbHtml=item.image?`<img class="item-thumb" src="${item.image}" alt="thumb" />`:'';
+    const thumbHtml=item.image?`<img class="item-thumb${item.cat==='book'?' book':''}" src="${item.image}" alt="thumb" />`:'';
     const itemLinks=(item.links&&item.links.length?item.links:(item.link?[item.link]:[])); 
     const linkHtml=itemLinks.map(lk=>{ const sl=lk.replace(/"/g,'&quot;'); return `<a class="item-link" href="${sl}" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>${lk.length>35?lk.substring(0,35)+'...':lk}</a>`; }).join('');
     const safeTitle=item.title.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     const canAlexa=item.cat==='music'||item.cat==='movie';
-    const statusOpts=STATUS_OPTIONS[item.cat]||[];
+    const rankEmoji = item.rank==='gold'?'🥇':item.rank==='silver'?'🥈':item.rank==='bronze'?'🥉':'';
     return `<div class="item-card" id="card-${item.id}" data-id="${item.id}">
+      ${rankEmoji?`<div class="rank-badge">${rankEmoji}</div>`:''}
       <div class="drag-handle" data-id="${item.id}">${SVG_GRIP}</div>
       <div class="item-body">
         <div class="item-top">
@@ -580,20 +620,26 @@ function renderList(){
           </div>
         </div>
         <div class="item-meta">
-          ${statusOpts.length?statusBadge(item.status):''}
-          ${priceStr}
-          ${item.deadline?deadlineBadge(item.deadline):''}
         </div>
         <div class="item-tags">${tags2}</div>
       </div>
       <div class="item-actions">
-        ${canAlexa?`<button class="alexa-launch-btn" onclick="launchOfficialApp('${item.cat}','${safeTitle}')">${SVG_PLAY}Alexa</button>`:''}
+        ${canAlexa?`<button class="alexa-launch-btn" onclick="launchOfficialApp('${item.cat}','${safeTitle}')">${SVG_PLAY}${item.cat==='music'?'MUSIC':'MOVIE'}</button>`:''}
         <button class="edit-btn" onclick="openModal(${item.id})">${SVG_EDIT}</button>
         <button class="delete-btn" onclick="confirmDelete(${item.id})">${SVG_TRASH}</button>
       </div>
     </div>`;
   }).join('');
   initTouchDrag();
+}
+
+// ===== 折りたたみ展開 =====
+function toggleExpand(id){
+  const el=document.getElementById(id);
+  const btn=document.getElementById('btn-'+id);
+  if(!el||!btn) return;
+  el.classList.toggle('open');
+  btn.classList.toggle('open');
 }
 
 // ===== Alexa起動 =====
@@ -683,6 +729,7 @@ function openModal(id){
   document.getElementById('ocrBtnArea').style.display='block';
   newCatSel=item?item.cat:activeCat;
   newSubCatSel=item?.subCat||null;
+  newRankSel=item?.rank||null;
   newTagSel=new Set(item?.tags||[]);
   document.getElementById('newTitle').value=item?.title||'';
   document.getElementById('newYomi').value=item?.yomi||'';
@@ -690,15 +737,28 @@ function openModal(id){
   document.getElementById('priceInput').value=item?.price||'';
   document.getElementById('deadlineInput').value=item?.deadline||'';
   document.getElementById('screenshotInput').value='';
+  document.getElementById('newMemo').value=item?.memo||'';
   document.getElementById('ocrStatus').textContent='';
   if(item?.image){ document.getElementById('ocrPreviewImg').src=item.image; document.getElementById('ocrPreview').style.display='block'; }
   else { document.getElementById('ocrPreview').style.display='none'; document.getElementById('ocrPreviewImg').src=''; }
-  renderModalCatSelect(); renderModalSubCatSelect(); updateDynamicFields(); renderTagSelect();
-  if(item){ if(item.status) document.getElementById('statusSelect').value=item.status; if(item.type) document.getElementById('typeSelect').value=item.type; }
+  renderModalCatSelect(); renderModalSubCatSelect(); updateDynamicFields(); renderTagSelect(); renderRankSelect();
+  if(item){ if(item.type) document.getElementById('typeSelect').value=item.type; }
   document.getElementById('modalOverlay').style.display='flex';
 }
 function closeModal(){ document.getElementById('modalOverlay').style.display='none'; editingId=null; }
 function closeModalIfBg(e){ if(e.target.id==='modalOverlay') closeModal(); }
+
+function renderRankSelect(){
+  const ranks=[
+    {id:'gold',  emoji:'🥇', label:'ゴールド'},
+    {id:'silver',emoji:'🥈', label:'シルバー'},
+    {id:'bronze',emoji:'🥉', label:'ブロンズ'},
+  ];
+  document.getElementById('rankSelectRow').innerHTML=
+    `<button class="rank-btn${newRankSel===null?' selected-none':''}" onclick="selectRank(null)" style="${newRankSel===null?'border-color:var(--accent);background:var(--surface2);color:var(--text);':''}">なし</button>`+
+    ranks.map(r=>`<button class="rank-btn${newRankSel===r.id?' selected-'+r.id:''}" onclick="selectRank('${r.id}')">${r.emoji} ${r.label}</button>`).join('');
+}
+function selectRank(rank){ newRankSel=rank; renderRankSelect(); }
 
 function renderModalCatSelect(){
   document.getElementById('catSelectRow').innerHTML=cats.map(c=>
@@ -721,12 +781,7 @@ function renderModalSubCatSelect(){
 function selectNewSubCat(sub){ newSubCatSel=sub; newTagSel=new Set(); renderModalSubCatSelect(); renderTagSelect(); }
 
 function updateDynamicFields(){
-  const opts=STATUS_OPTIONS[newCatSel]||[];
-  const ss=document.getElementById('statusSection');
   const ts=document.getElementById('typeSection');
-  const is=document.getElementById('interestSection');
-  if(newCatSel==='other'){ ss.style.display='none'; is.style.display='block'; }
-  else { ss.style.display=opts.length?'block':'none'; is.style.display='none'; if(opts.length) document.getElementById('statusSelect').innerHTML=opts.map(o=>`<option value="${o.v}">${o.l}</option>`).join(''); }
   ts.style.display=newCatSel==='music'?'block':'none';
 }
 
@@ -766,6 +821,7 @@ function clearImage(){
   document.getElementById('ocrPreviewImg').src='';
   document.getElementById('ocrStatus').textContent='';
   document.getElementById('screenshotInput').value='';
+  document.getElementById('newMemo').value=item?.memo||'';
 }
 // 複数リンク管理
 let linkCount = 0;
@@ -841,18 +897,19 @@ function saveItem(){
   if(editingId){
     const item=items.find(x=>x.id===editingId);
     if(item){
-      item.title=title; item.yomi=yomi||undefined; item.cat=newCatSel; item.subCat=newSubCatSel||undefined;
+      const memo=document.getElementById('newMemo').value.trim(); item.title=title; item.yomi=yomi||undefined; item.cat=newCatSel; item.subCat=newSubCatSel||undefined; item.rank=newRankSel||undefined; item.memo=memo||undefined;
       item.tags=[...newTagSel]; const lks=getLinks(); item.links=lks.length?lks:undefined; item.link=lks[0]||undefined; item.image=image||item.image||undefined;
-      if(STATUS_OPTIONS[newCatSel]?.length) item.status=document.getElementById('statusSelect').value;
+      // status廃止
       if(newCatSel==='music') item.type=document.getElementById('typeSelect').value;
       if(newCatSel==='other'){ const p=document.getElementById('priceInput').value; const d=document.getElementById('deadlineInput').value; item.price=p?parseInt(p):undefined; item.deadline=d||undefined; }
       else { delete item.price; delete item.deadline; }
     }
     showToast('更新しました！');
   } else {
-    const ni={id:Date.now(),title,yomi:yomi||undefined,cat:newCatSel,subCat:newSubCatSel||undefined,tags:[...newTagSel],order:items.length};
+    const memo2=document.getElementById('newMemo').value.trim();
+    const ni={id:Date.now(),title,yomi:yomi||undefined,cat:newCatSel,subCat:newSubCatSel||undefined,rank:newRankSel||undefined,memo:memo2||undefined,tags:[...newTagSel],order:items.length};
     const lks2=getLinks(); if(lks2.length){ni.links=lks2; ni.link=lks2[0];} if(image) ni.image=image;
-    if(STATUS_OPTIONS[newCatSel]?.length) ni.status=document.getElementById('statusSelect').value;
+      // status廃止
     if(newCatSel==='music') ni.type=document.getElementById('typeSelect').value;
     if(newCatSel==='other'){ const p=document.getElementById('priceInput').value; const d=document.getElementById('deadlineInput').value; if(p) ni.price=parseInt(p); if(d) ni.deadline=d; }
     items.push(ni);
@@ -1015,6 +1072,113 @@ function confirmResetData(){
   }catch(e){}
   closeSettings(); renderCatTabs(); renderSubTabs(); renderTagRow(); renderList();
   showToast('✅ データをリセットしました');
+}
+
+// ===== シェア機能 =====
+const APP_URL = 'https://ak-yokohama.github.io/clip/';
+
+function openShareModal(){
+  document.getElementById('shareOverlay').style.display='flex';
+  // シェアテキストを生成
+  generateShareText();
+  // 画面キャプチャ（非同期）
+  captureListArea();
+}
+function closeShareModal(){
+  document.getElementById('shareOverlay').style.display='none';
+  document.getElementById('shareImgPreview').style.display='none';
+  document.getElementById('shareImgPreview').src='';
+}
+function closeShareIfBg(e){ if(e.target.id==='shareOverlay') closeShareModal(); }
+
+function generateShareText(){
+  const cat=cats.find(c=>c.id===activeCat)||cats[0];
+  const list=getFiltered().slice(0,5);
+  const golds=items.filter(i=>i.cat===activeCat&&i.rank==='gold').slice(0,3);
+  let listStr='';
+  if(golds.length>0) listStr=golds.map(i=>'\u2B50 '+i.title).join('\n');
+  else if(list.length>0) listStr=list.map(i=>'\u25B8 '+i.title).join('\n');
+  const allTags=Object.values(tags[activeCat]||{}).flat().filter(Boolean).slice(0,3);
+  const hashTags=(allTags.length>0?allTags.map(t=>t.startsWith('#')?t:'#'+t).join(' '):'#'+cat.label)+'  #TheMasterShelf';
+  const text='\u300BThe MasterShelf\u300Cで自分だけの'+cat.emoji+cat.label+'棚を構築中！\n\n'+listStr+'\n\n'+hashTags+'\n\n\u25BC アプリはこちら\n'+APP_URL;
+  document.getElementById('shareTextArea').value=text;
+}
+
+async function captureListArea(){
+  const status = document.getElementById('shareStatus');
+  const imgEl = document.getElementById('shareImgPreview');
+  status.textContent = '📷 棚の画像を生成中...';
+  try{
+    if(typeof html2canvas === 'undefined'){
+      status.textContent = '⚠️ 画像生成ライブラリを読み込み中...';
+      await new Promise(resolve=>setTimeout(resolve,1000));
+    }
+    const target = document.getElementById('listArea');
+    const canvas = await html2canvas(target, {
+      backgroundColor: '#0E0E12',
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+    });
+    const dataUrl = canvas.toDataURL('image/png');
+    imgEl.src = dataUrl;
+    imgEl.style.display = 'block';
+    status.textContent = '✅ 画像を生成しました！シェアボタンで添付できます';
+  } catch(e){
+    status.textContent = '⚠️ 画像生成に失敗しました。テキストのみシェアできます';
+  }
+}
+
+async function doShare(){
+  const text = document.getElementById('shareTextArea').value;
+  const imgEl = document.getElementById('shareImgPreview');
+  // Web Share APIが使えるか確認
+  if(navigator.share){
+    try{
+      const shareData = { title:'The MasterShelf', text };
+      // 画像がある場合は添付
+      if(imgEl.src && imgEl.style.display!=='none' && navigator.canShare){
+        try{
+          const res = await fetch(imgEl.src);
+          const blob = await res.blob();
+          const file = new File([blob],'mastershelf.png',{type:'image/png'});
+          if(navigator.canShare({files:[file]})){
+            shareData.files = [file];
+          }
+        }catch(e){ /* 画像なしでシェア */ }
+      }
+      await navigator.share(shareData);
+      closeShareModal();
+      showToast('✅ シェアしました！');
+    }catch(e){
+      if(e.name!=='AbortError') showToast('シェアに失敗しました');
+    }
+  } else {
+    // フォールバック：クリップボードにコピー
+    copyShareText();
+  }
+}
+
+function copyShareText(){
+  const text = document.getElementById('shareTextArea').value;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(text)
+      .then(()=>{ showToast('📋 クリップボードにコピーしました！'); closeShareModal(); })
+      .catch(()=>{ fallbackCopy(text); });
+  } else {
+    fallbackCopy(text);
+  }
+}
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta);
+  ta.select();
+  try{ document.execCommand('copy'); showToast('📋 コピーしました！'); closeShareModal(); }
+  catch(e){ showToast('コピーに失敗しました'); }
+  document.body.removeChild(ta);
 }
 
 // ===== Toast =====
